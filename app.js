@@ -479,6 +479,8 @@ const staticText = {
     complete: 'Simulation Complete',
     completed: 'Senaryo Tamamlandı',
     shortDebrief: 'Kısa Debrief',
+    branchProgress: 'Branch Progress',
+    branchPath: 'Yol',
     situationTitle: 'Durum Güncellemesi',
     findingTitle: 'Yeni Bulgular',
     pressureTitle: 'Anlık Baskılar',
@@ -552,6 +554,8 @@ const staticText = {
     complete: 'Simulation Complete',
     completed: 'Scenario Complete',
     shortDebrief: 'Short Debrief',
+    branchProgress: 'Branch Progress',
+    branchPath: 'Path',
     situationTitle: 'Situation Update',
     findingTitle: 'New Findings',
     pressureTitle: 'Active Pressures',
@@ -657,6 +661,7 @@ const coordinationEl = $('coordination');
 const riskEl = $('risk');
 const progressFill = $('progress-fill');
 const progressText = $('progress-text');
+const branchProgress = $('branch-progress');
 const alertText = $('alert-text');
 const streakBadge = $('streak-badge');
 const scenarioName = $('scenario-name');
@@ -740,6 +745,35 @@ function startScenario() {
   renderNode();
 }
 
+function renderBranchProgress() {
+  const labels = {
+    tr: ['İlk Alarm', 'Eskalasyon', 'Delil', 'Stratejik Kapanış'],
+    en: ['Initial Alert', 'Escalation', 'Evidence', 'Strategic Closure']
+  };
+  branchProgress.innerHTML = '';
+  labels[currentLanguage].forEach((label, idx) => {
+    const step = document.createElement('div');
+    const stepNumber = idx + 1;
+    let cls = 'branch-step';
+    let note = currentLanguage === 'tr' ? 'Henüz işlenmedi' : 'Not reached yet';
+    if (stepNumber < state.stage) {
+      cls += ' done';
+      const hist = state.history[idx];
+      const positive = hist?.tone === 'positive';
+      if (!positive) cls += ' bad';
+      note = positive
+        ? (currentLanguage === 'tr' ? 'Olumlu yol seçildi' : 'Positive path selected')
+        : (currentLanguage === 'tr' ? 'Riskli yol seçildi' : 'Risk path selected');
+    } else if (stepNumber === state.stage) {
+      cls += ' active';
+      note = currentLanguage === 'tr' ? 'Şu an bu aşamadasınız' : 'You are here now';
+    }
+    step.className = cls;
+    step.innerHTML = `<span class="branch-step-title">${stepNumber}. ${label}</span><span class="branch-step-note">${note}</span>`;
+    branchProgress.appendChild(step);
+  });
+}
+
 function renderStats() {
   scoreEl.textContent = state.score;
   stageEl.textContent = state.stage;
@@ -751,6 +785,7 @@ function renderStats() {
   progressFill.style.width = `${progress}%`;
   progressText.textContent = `${state.stage} / 4`;
   streakBadge.textContent = state.trophies.length ? `🏅 ${tr(state.trophies[state.trophies.length - 1])}` : t().bonusActive;
+  renderBranchProgress();
 }
 
 function startTimer() {
@@ -1012,6 +1047,8 @@ function applyStaticText() {
   $('complete-kicker').textContent = t().complete;
   $('completed-title').textContent = t().completed;
   $('debrief-title').textContent = t().shortDebrief;
+  $('branch-progress-label').textContent = t().branchProgress;
+  $('branch-path-label').textContent = t().branchPath;
   $('situation-title').textContent = t().situationTitle;
   $('finding-title').textContent = t().findingTitle;
   $('pressure-title').textContent = t().pressureTitle;
