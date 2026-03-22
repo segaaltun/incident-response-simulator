@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Incident Response Simulator</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="hero">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Türkiye Biosecurity Workshop 2026 • Gamified Simulation</p>
+          <h1>Incident Response: What Would You Do?</h1>
+          <p class="subtitle">
+            Biyogüvenlik ve siber güvenlik ekseninde, kurumsal karar kalitesini,
+            eskalasyon doğruluğunu ve delil bütünlüğünü görünür kılmak için tasarlanmış
+            çok senaryolu, puanlamalı profesyonel workshop demosu.
+          </p>
+        </div>
+        <div class="hero-status">
+          <div class="status-card critical">
+            <span class="status-label">Threat Level</span>
+            <strong>Dynamic</strong>
+          </div>
+          <div class="status-card">
+            <span class="status-label">Mode</span>
+            <strong>Interactive Presentation</strong>
+          </div>
+          <div class="status-card">
+            <span class="status-label">Scenarios</span>
+            <strong>5 Branching Cases</strong>
+          </div>
+          <div class="status-card">
+            <span class="status-label">Presenter</span>
+            <strong>Prof. Dr. Ahmet Altun</strong>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="card">
+      <section id="scenario-screen" class="screen active">
+        <div class="scenario-kicker">Scenario Selection</div>
+        <div class="section-head">
+          <div>
+            <h2>Bir senaryo seçin</h2>
+            <p class="muted-copy">
+              Her senaryo, araştırma güvenliği ve incident response pratiğinin farklı bir yönünü temsil eder.
+              Katılımcılar seçtikleri senaryoda adım adım karar verir; doğru seçimler bonus puan,
+              rozet ve pozitif geri bildirimlerle ödüllendirilir.
+            </p>
+          </div>
+          <button id="fullscreen-btn" class="secondary-btn">⛶ Sunum Modu</button>
+        </div>
+        <div id="scenario-list" class="scenario-list"></div>
+      </section>
+
+      <section id="onboarding-screen" class="screen">
+        <div class="scenario-kicker">How to Play</div>
+        <h2 id="onboarding-scenario-title">Senaryo</h2>
+        <p id="onboarding-scenario-summary" class="muted-copy"></p>
+
+        <div class="onboarding-grid">
+          <div class="onboarding-card">
+            <h3>Oyun mantığı</h3>
+            <ul>
+              <li>Her senaryo 4 aşamalıdır.</li>
+              <li>Her aşamada 1 karar verirsiniz.</li>
+              <li>Doğru seçimler puan ve rozet kazandırır.</li>
+              <li>Yanlış seçimler risk puanı ve kaliteyi düşürür.</li>
+            </ul>
+          </div>
+          <div class="onboarding-card">
+            <h3>Değerlendirme eksenleri</h3>
+            <ul>
+              <li>Hız</li>
+              <li>Kanıt bütünlüğü</li>
+              <li>Kurumsal koordinasyon</li>
+              <li>Risk kontrolü</li>
+            </ul>
+          </div>
+          <div class="onboarding-card">
+            <h3>Beklenen yaklaşım</h3>
+            <ul>
+              <li>Containment + delil koruma dengesi</li>
+              <li>Doğru eskalasyon</li>
+              <li>SOP ve governance uyumu</li>
+              <li>Olaydan öğrenme ve debrief</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="end-actions">
+          <button id="onboarding-start-btn" class="primary">Senaryoyu Başlat</button>
+          <button id="onboarding-back-btn" class="secondary-btn">Geri Dön</button>
+        </div>
+      </section>
+
+      <section id="game-screen" class="screen">
+        <div class="topbar">
+          <div>
+            <span class="label">Toplam Skor</span>
+            <strong id="score">0</strong>
+          </div>
+          <div>
+            <span class="label">Aşama</span>
+            <strong id="stage">1</strong>
+          </div>
+        </div>
+
+        <div class="progress-wrap">
+          <div class="progress-head">
+            <span>Response Progress</span>
+            <span id="progress-text">1 / 4</span>
+          </div>
+          <div class="progress-bar">
+            <div id="progress-fill" class="progress-fill"></div>
+          </div>
+        </div>
+
+        <div class="alert-strip">
+          <div class="pulse-dot"></div>
+          <span id="alert-text">Live alert feed active.</span>
+        </div>
+
+        <div class="meters">
+          <div class="meter"><span>Hız</span><strong id="speed">50</strong></div>
+          <div class="meter"><span>Kanıt Koruma</span><strong id="evidence">50</strong></div>
+          <div class="meter"><span>Koordinasyon</span><strong id="coordination">50</strong></div>
+          <div class="meter"><span>Risk Kontrolü</span><strong id="risk">50</strong></div>
+        </div>
+
+        <div class="badge-row">
+          <div class="live-badge" id="streak-badge">🏅 Bonus fırsatı aktif</div>
+          <div class="live-badge secondary" id="scenario-name">Scenario</div>
+          <div class="live-badge secondary" id="presenter-badge">Prof. Dr. Ahmet Altun</div>
+        </div>
+
+        <article class="scenario-box">
+          <h2 id="node-title"></h2>
+          <p id="node-text"></p>
+        </article>
+
+        <section>
+          <h3>Ne yaparsınız?</h3>
+          <div id="choices" class="choices"></div>
+        </section>
+
+        <section id="feedback-panel" class="feedback hidden">
+          <div id="feedback-emoji" class="feedback-emoji">🏅</div>
+          <h3 id="feedback-heading">Geri Bildirim</h3>
+          <p id="feedback-text"></p>
+          <div class="feedback-tags">
+            <span class="feedback-tag">Containment</span>
+            <span class="feedback-tag">Evidence Integrity</span>
+            <span class="feedback-tag">Institutional Coordination</span>
+          </div>
+          <div id="reward-strip" class="reward-strip"></div>
+          <button id="next-btn" class="primary">Devam Et</button>
+        </section>
+      </section>
+
+      <section id="end-screen" class="screen">
+        <div class="scenario-kicker">Simulation Complete</div>
+        <h2>Senaryo Tamamlandı</h2>
+        <div id="final-badge" class="final-badge"></div>
+        <p id="final-summary"></p>
+        <div id="final-scores" class="meters final"></div>
+        <div id="trophy-case" class="trophy-case"></div>
+        <div class="end-actions">
+          <button id="restart-btn" class="primary">Senaryo Seçimine Dön</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
