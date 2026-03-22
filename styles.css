@@ -306,6 +306,36 @@ button:focus-visible {
   border-radius: 22px; padding:22px; margin-bottom:22px; border:1px solid rgba(255,255,255,0.1);
   box-shadow: 0 18px 44px rgba(0,0,0,0.24);
 }
+.narrative-box {
+  border: 1px solid rgba(255,138,61,0.22);
+  background: linear-gradient(180deg, rgba(34,27,58,0.92), rgba(27,23,52,0.94));
+}
+.content-chip {
+  display: inline-block;
+  margin-bottom: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.narrative-chip {
+  background: linear-gradient(135deg, rgba(255,138,61,0.24), rgba(255,95,210,0.18));
+  color: #fff3ea;
+  border: 1px solid rgba(255,138,61,0.22);
+}
+.info-chip {
+  background: linear-gradient(135deg, rgba(68,199,255,0.18), rgba(143,91,255,0.14));
+  color: #eef7ff;
+  border: 1px solid rgba(68,199,255,0.16);
+}
+.narrative-box #node-text {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.08rem;
+  line-height: 1.78;
+  color: rgba(247,243,255,0.96);
+}
 .detail-grid {
   display: grid;
   grid-template-columns: 1.3fr 1fr 1fr;
@@ -317,6 +347,19 @@ button:focus-visible {
   border: 1px solid rgba(255,255,255,0.10);
   border-radius: 18px;
   padding: 16px;
+}
+.detail-card {
+  position: relative;
+}
+.detail-card h3,
+.detail-card h4 {
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+.detail-card p,
+.detail-card li {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+  font-size: 0.94rem;
+  line-height: 1.68;
 }
 .detail-card {
   min-height: 100%;
