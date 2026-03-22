@@ -479,6 +479,9 @@ const staticText = {
     complete: 'Simulation Complete',
     completed: 'Senaryo Tamamlandı',
     shortDebrief: 'Kısa Debrief',
+    situationTitle: 'Durum Güncellemesi',
+    findingTitle: 'Yeni Bulgular',
+    pressureTitle: 'Anlık Baskılar',
     score: 'Toplam Skor',
     stage: 'Aşama',
     speed: 'Hız',
@@ -549,6 +552,9 @@ const staticText = {
     complete: 'Simulation Complete',
     completed: 'Scenario Complete',
     shortDebrief: 'Short Debrief',
+    situationTitle: 'Situation Update',
+    findingTitle: 'New Findings',
+    pressureTitle: 'Active Pressures',
     score: 'Total Score',
     stage: 'Stage',
     speed: 'Speed',
@@ -606,7 +612,8 @@ const initialState = () => ({
   evidence: 50,
   coordination: 50,
   risk: 50,
-  trophies: []
+  trophies: [],
+  history: []
 });
 
 let state = initialState();
@@ -659,6 +666,9 @@ const finalScores = $('final-scores');
 const finalBadge = $('final-badge');
 const trophyCase = $('trophy-case');
 const debriefList = $('debrief-list');
+const situationText = $('situation-text');
+const findingList = $('finding-list');
+const pressureList = $('pressure-list');
 
 function t() { return staticText[currentLanguage]; }
 function clamp(value) { return Math.max(0, Math.min(100, value)); }
@@ -759,11 +769,142 @@ function startTimer() {
   }, 1000);
 }
 
+function buildNarrative(nodeKey) {
+  const scenarioName = tr(state.scenario.name);
+  const stageLabels = {
+    tr: {
+      start: {
+        situation: `${scenarioName} senaryosu başladı. İlk işaretler artık somut bir olaya dönüştü ve ekip sizden ilk yanıtı yapılandırmanızı bekliyor.`,
+        findings: [
+          'Anormal erişim/zamanlama bilgisi doğrulandı.',
+          'Olayın yalnızca teknik değil, yönetsel etkileri de olabilir.',
+          'İlk 10-15 dakika karar kalitesini belirleyecek.'
+        ],
+        pressures: [
+          'Hızlı containment baskısı',
+          'Delil kaybı riski',
+          'Yanlış erken karar verme riski'
+        ]
+      },
+      comms: {
+        situation: state.history.length
+          ? `İlk kararınızdan sonra olay görünürlüğü arttı. ${state.history[state.history.length - 1].tone === 'positive' ? 'Başlangıç kontrolü kısmen sağlandı; şimdi kurumsal koordinasyon testi başlıyor.' : 'İlk yanıt zayıf kaldığı için iletişim yükü ve belirsizlik arttı; şimdi koordinasyon kritik.'}`
+          : 'İlk müdahalenin ardından kurum içi iletişim ve eskalasyon kararı gerekiyor.',
+        findings: [
+          'Yönetim kısa durum özeti talep ediyor.',
+          'IT/security tarafı rol dağılımı bekliyor.',
+          'Yanlış kişi/kanal seçimi olay yönetimini bozabilir.'
+        ],
+        pressures: [
+          'Bilgi kirliliğini önleme baskısı',
+          'Doğru eskalasyon zinciri kurma ihtiyacı',
+          'Kurumsal güven kaybı riski'
+        ]
+      },
+      evidence: {
+        situation: state.history.length
+          ? `Olay artık daha görünür. ${state.history[state.history.length - 1].tone === 'positive' ? 'Ekip sizden delil bütünlüğünü bozmadan derin analiz yapmanızı bekliyor.' : 'Önceki kararlar nedeniyle delil penceresi daraldı; şimdi daha dikkatli hareket etmek zorundasınız.'}`
+          : 'Delil toplama ve kapsam analizi aşaması başladı.',
+        findings: [
+          'Erişim kayıtları daha derin inceleme gerektiriyor.',
+          'Kapsam tahmini için zaman çizelgesi kritik.',
+          'Bu aşamadaki hata kök neden analizini zayıflatır.'
+        ],
+        pressures: [
+          'Chain-of-custody baskısı',
+          'Kök neden analizi ihtiyacı',
+          'Hizmet sürekliliği ile analiz dengesi'
+        ]
+      },
+      decision: {
+        situation: state.history.length
+          ? `İlk response döngüsü tamamlanmak üzere. ${state.history.filter((x) => x.tone === 'positive').length >= 2 ? 'Şimdi bunu kurumsal öğrenmeye çevirmek için güçlü bir fırsat var.' : 'Önceki eksiklikleri telafi etmek için stratejik kapanış çok önemli.'}`
+          : 'Stratejik kapanış ve iyileştirme aşamasına geçildi.',
+        findings: [
+          'Yönetim düzeltici aksiyon çerçevesi bekliyor.',
+          'Olay sınıflandırması ve debrief gündemde.',
+          'Tekrarlama riskini azaltacak kararlar ön planda.'
+        ],
+        pressures: [
+          'Reputasyon ve güven baskısı',
+          'Sürdürülebilir önlem beklentisi',
+          'Kurumsal öğrenmeyi gösterme ihtiyacı'
+        ]
+      }
+    },
+    en: {
+      start: {
+        situation: `The ${scenarioName} scenario has started. Early signals have now become a concrete incident, and the team expects you to structure the first response.`,
+        findings: [
+          'Abnormal access/timing has been confirmed.',
+          'The event may have managerial as well as technical impact.',
+          'The first 10–15 minutes will shape response quality.'
+        ],
+        pressures: [
+          'Pressure for rapid containment',
+          'Risk of evidence loss',
+          'Risk of premature bad decisions'
+        ]
+      },
+      comms: {
+        situation: state.history.length
+          ? `After your first decision, incident visibility increased. ${state.history[state.history.length - 1].tone === 'positive' ? 'Initial control is partly in place; now the institutional coordination test begins.' : 'Because the initial response was weak, communication load and ambiguity increased; coordination is now critical.'}`
+          : 'Following the first intervention, an institutional communication and escalation decision is required.',
+        findings: [
+          'Leadership is requesting a short situation brief.',
+          'IT/security expects role clarity.',
+          'Choosing the wrong audience or channel may disrupt incident management.'
+        ],
+        pressures: [
+          'Pressure to prevent information noise',
+          'Need to activate the right escalation chain',
+          'Risk of institutional trust loss'
+        ]
+      },
+      evidence: {
+        situation: state.history.length
+          ? `The incident is now more visible. ${state.history[state.history.length - 1].tone === 'positive' ? 'The team expects deeper analysis without damaging evidence integrity.' : 'Earlier choices narrowed the evidence window; you now need to act more carefully.'}`
+          : 'Evidence collection and scope analysis have begun.',
+        findings: [
+          'Access records require deeper review.',
+          'Timeline reconstruction is critical for scope estimation.',
+          'Mistakes here weaken root-cause analysis.'
+        ],
+        pressures: [
+          'Chain-of-custody pressure',
+          'Need for root-cause analysis',
+          'Balancing service continuity and analysis'
+        ]
+      },
+      decision: {
+        situation: state.history.length
+          ? `The first response cycle is nearing completion. ${state.history.filter((x) => x.tone === 'positive').length >= 2 ? 'There is now a strong opportunity to turn this into institutional learning.' : 'A strategic closure is essential to compensate for earlier weaknesses.'}`
+          : 'The strategic closure and improvement phase has begun.',
+        findings: [
+          'Leadership expects a corrective action framework.',
+          'Incident classification and debrief are now on the table.',
+          'Decisions that reduce recurrence risk are central.'
+        ],
+        pressures: [
+          'Reputation and trust pressure',
+          'Expectation for sustainable controls',
+          'Need to demonstrate institutional learning'
+        ]
+      }
+    }
+  };
+  return stageLabels[currentLanguage][nodeKey];
+}
+
 function renderNode() {
   const node = state.scenario.nodes[state.current];
+  const narrative = buildNarrative(state.current);
   nodeTitle.textContent = tr(node.title);
   nodeText.textContent = tr(node.text);
   alertText.textContent = `Live alert feed: ${tr(node.alert)}`;
+  situationText.textContent = narrative.situation;
+  findingList.innerHTML = narrative.findings.map((item) => `<li>${item}</li>`).join('');
+  pressureList.innerHTML = narrative.pressures.map((item) => `<li>${item}</li>`).join('');
   choicesEl.innerHTML = '';
   feedbackPanel.classList.add('hidden');
   pendingNext = null;
@@ -803,6 +944,7 @@ function handleChoice(choice, autoSelected = false) {
 
   feedbackText.textContent = tr(choice.feedback);
   feedbackPanel.classList.remove('hidden');
+  state.history.push({ node: state.current, tone: choice.tone, badge: choice.badge });
   pendingNext = choice.next;
   [...choicesEl.querySelectorAll('button')].forEach((btn) => (btn.disabled = true));
   renderStats();
@@ -870,6 +1012,9 @@ function applyStaticText() {
   $('complete-kicker').textContent = t().complete;
   $('completed-title').textContent = t().completed;
   $('debrief-title').textContent = t().shortDebrief;
+  $('situation-title').textContent = t().situationTitle;
+  $('finding-title').textContent = t().findingTitle;
+  $('pressure-title').textContent = t().pressureTitle;
   $('score-label').textContent = t().score;
   $('stage-label').textContent = t().stage;
   $('speed-label').textContent = t().speed;
