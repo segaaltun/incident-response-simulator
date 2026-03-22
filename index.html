@@ -144,32 +144,59 @@
         </article>
 
         <section class="detail-grid">
-          <div class="story-card detail-card detail-card-wide">
-            <div class="content-chip info-chip" id="info-chip-1">Information Panel</div>
-            <h3 id="stage-summary-title">Aşama Özeti</h3>
-            <div class="detail-block">
-              <h4 id="setting-title">Ortam / Bağlam</h4>
-              <p id="setting-text"></p>
-            </div>
-            <div class="detail-block">
-              <h4 id="current-title">Mevcut Durum</h4>
-              <p id="current-text"></p>
-            </div>
-            <div class="detail-block">
-              <h4 id="changed-title">Önceki Kararın Etkisi</h4>
-              <p id="changed-text"></p>
+          <div class="story-card detail-card detail-card-wide accordion-card">
+            <button type="button" class="accordion-trigger" id="accordion-trigger-1" aria-expanded="false" aria-controls="accordion-panel-1">
+              <span>
+                <span class="content-chip info-chip" id="info-chip-1">Information Panel</span>
+                <h3 id="stage-summary-title">Aşama Özeti</h3>
+              </span>
+              <span class="accordion-icon" aria-hidden="true">⌄</span>
+            </button>
+            <div class="accordion-panel hidden" id="accordion-panel-1">
+              <div class="detail-block">
+                <h4 id="setting-title">Ortam / Bağlam</h4>
+                <p id="setting-text"></p>
+              </div>
+              <div class="detail-block">
+                <h4 id="current-title">Mevcut Durum</h4>
+                <p id="current-text"></p>
+              </div>
+              <div class="detail-block">
+                <h4 id="changed-title">Önceki Kararın Etkisi</h4>
+                <p id="changed-text"></p>
+              </div>
             </div>
           </div>
-          <div class="story-card detail-card">
-            <div class="content-chip info-chip" id="info-chip-2">Information Panel</div>
-            <h3 id="developments-title">Yeni Gelişmeler ve Bulgular</h3>
-            <ul id="developments-list"></ul>
+          <div class="story-card detail-card accordion-card">
+            <button type="button" class="accordion-trigger" id="accordion-trigger-2" aria-expanded="false" aria-controls="accordion-panel-2">
+              <span>
+                <span class="content-chip info-chip" id="info-chip-2">Information Panel</span>
+                <h3 id="developments-title">Yeni Gelişmeler ve Bulgular</h3>
+              </span>
+              <span class="accordion-icon" aria-hidden="true">⌄</span>
+            </button>
+            <div class="accordion-panel hidden" id="accordion-panel-2">
+              <ul id="developments-list"></ul>
+            </div>
           </div>
-          <div class="story-card detail-card">
-            <div class="content-chip info-chip" id="info-chip-3">Information Panel</div>
-            <h3 id="options-title">Şu Anki Seçenekler</h3>
-            <ul id="options-list"></ul>
+          <div class="story-card detail-card accordion-card">
+            <button type="button" class="accordion-trigger" id="accordion-trigger-3" aria-expanded="false" aria-controls="accordion-panel-3">
+              <span>
+                <span class="content-chip info-chip" id="info-chip-3">Information Panel</span>
+                <h3 id="options-title">Şu Anki Seçenekler</h3>
+              </span>
+              <span class="accordion-icon" aria-hidden="true">⌄</span>
+            </button>
+            <div class="accordion-panel hidden" id="accordion-panel-3">
+              <ul id="options-list"></ul>
+            </div>
           </div>
+        </section>
+
+        <section id="email-sample-panel" class="story-card email-sample-card hidden" aria-live="polite">
+          <div class="content-chip info-chip" id="email-sample-chip">Example Message</div>
+          <h3 id="email-sample-title">Örnek Şüpheli E-posta</h3>
+          <pre id="email-sample-content" class="email-sample-content"></pre>
         </section>
 
         <section>

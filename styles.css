@@ -350,6 +350,7 @@ button:focus-visible {
 }
 .detail-card {
   position: relative;
+  min-height: 100%;
 }
 .detail-card h3,
 .detail-card h4 {
@@ -361,13 +362,61 @@ button:focus-visible {
   font-size: 0.94rem;
   line-height: 1.68;
 }
-.detail-card {
-  min-height: 100%;
-}
 .detail-card-wide {
   display: flex;
   flex-direction: column;
   gap: 14px;
+}
+.accordion-card {
+  padding: 0;
+  overflow: hidden;
+}
+.accordion-trigger {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+.accordion-trigger h3 {
+  margin: 0;
+}
+.accordion-trigger .content-chip {
+  margin-bottom: 10px;
+}
+.accordion-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--blue);
+  transition: transform 0.2s ease;
+}
+.accordion-trigger[aria-expanded="true"] .accordion-icon {
+  transform: rotate(180deg);
+}
+.accordion-panel {
+  padding: 0 16px 16px;
+}
+.email-sample-card {
+  margin-bottom: 22px;
+}
+.email-sample-content {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+  font-size: 0.94rem;
+  line-height: 1.7;
+  color: var(--text);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 16px;
 }
 .detail-block {
   padding: 12px 14px;
@@ -426,6 +475,7 @@ button:focus-visible {
   color:white; font-weight:800;
 }
 .choice-copy { display:block; line-height:1.5; }
+.hidden { display: none !important; }
 .feedback.hidden { display:none; }
 .feedback-emoji { font-size: 2rem; margin-bottom: 8px; }
 .keyboard-hint {
@@ -497,6 +547,9 @@ body.presentation-mode .choices.choices-count-5 .choice-copy { font-size: 1.02re
 body.presentation-mode .choice-index { min-width: 42px; height: 42px; }
 body.presentation-mode .meter strong,
 body.presentation-mode .topbar strong { font-size: 1.7rem; }
+body.presentation-mode .accordion-trigger,
+body.presentation-mode .email-sample-content { font-size: 1.05rem; }
+body.presentation-mode .accordion-icon { font-size: 1.7rem; }
 @keyframes pulse {
   0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255,138,61,0.55); }
   70% { transform: scale(1); box-shadow: 0 0 0 12px rgba(255,138,61,0); }
