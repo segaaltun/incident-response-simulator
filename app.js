@@ -280,8 +280,38 @@ function buildPartnerNodes() { /* simplified but rich */
       title: ['Aşama 1 — Talebi Durdur, Kimliği Doğrula, Kayıt Aç', 'Stage 1 — Hold the Request, Verify Identity, Open a Record'],
       text: ['Uzun süredir birlikte çalışılan bir Avrupa laboratuvarından geliyormuş gibi görünen e-postada, SOP dışı olarak ham dizileme verisi, tedarikçi listesi ve örnek sevkiyat planı isteniyor. Mesaj dili profesyonel; ancak gönderici alanı benzer görünümlü yeni bir alan adı kullanıyor ve talep mevcut proje takvimine uymuyor. Aşağıda ekipte dolaşıma sokulan örnek mesajı da görüyorsunuz.', 'An email appearing to come from a long-term European partner requests raw sequencing data, supplier lists, and sample-shipment plans outside SOP. The wording is professional, but the sender uses a look-alike domain and the request does not match the current project timeline. You also see the sample message that has been circulating in the team below.'],
       emailSample: {
-        tr: 'Kimden: Dr. Elise Martin <elise.martin@eu-biocollab.org>\nKime: Proje Koordinatörü\nKonu: ACİL — Ham dizileme çıktıları ve sevkiyat planı teyidi\n\nMerhaba,\n\nYarın sabah yapılacak yönetim değerlendirmesi öncesinde aşağıdaki materyalleri bu gece paylaşabilir misiniz?\n\n- Son ham FASTQ / dizileme çıktıları\n- Güncel tedarikçi ve sipariş listesi\n- Önümüzdeki iki haftaya ait örnek sevkiyat planı\n\nPI onayını pazartesi sistemde tamamlarız; şu an sadece hız kazanmamız gerekiyor. Mevcut güvenli portal erişimde görünmüyor, bu yüzden bu e-posta zincirine doğrudan yanıt vermeniz yeterli olacaktır. Mümkünse dosyaları sıkıştırılmış klasör olarak gönderin.\n\nÇok acil; Avrupa tarafında gün sonu kapanmadan almamız gerekiyor.\n\nTeşekkürler,\nElise\nExternal Collaboration Office',
-        en: 'From: Dr. Elise Martin <elise.martin@eu-biocollab.org>\nTo: Project Coordinator\nSubject: URGENT — confirmation of raw sequencing outputs and shipment plan\n\nHello,\n\nBefore tomorrow morning\'s management review, could you please share the following tonight?\n\n- Latest raw FASTQ / sequencing outputs\n- Current supplier and order list\n- Sample shipment plan for the next two weeks\n\nWe can complete PI approval in the system on Monday; right now we only need to move quickly. The usual secure portal is not visible on my side, so replying directly to this email thread will be sufficient. If possible, please send the files as a compressed folder.\n\nThis is very urgent; we need it before close of business on the European side.\n\nThanks,\nElise\nExternal Collaboration Office'
+        tr: {
+          fromName: 'Dr. Elise Martin',
+          fromEmail: 'elise.martin@eu-biocollab.org',
+          to: 'Proje Koordinatörü',
+          subject: 'ACİL — Ham dizileme çıktıları ve sevkiyat planı teyidi',
+          sentAt: 'Cuma, 19:42',
+          preview: 'PI onayı pazartesi tamamlanır; bu akşam dosyaları doğrudan bu e-posta zincirine iletmeniz yeterli olacaktır.',
+          body: [
+            'Merhaba,',
+            'Yarın sabah yapılacak yönetim değerlendirmesi öncesinde aşağıdaki materyalleri bu gece paylaşabilir misiniz?',
+            '• Son ham FASTQ / dizileme çıktıları\n• Güncel tedarikçi ve sipariş listesi\n• Önümüzdeki iki haftaya ait örnek sevkiyat planı',
+            'PI onayını pazartesi sistemde tamamlarız; şu an sadece hız kazanmamız gerekiyor. Mevcut güvenli portal erişimde görünmüyor, bu yüzden bu e-posta zincirine doğrudan yanıt vermeniz yeterli olacaktır. Mümkünse dosyaları sıkıştırılmış klasör olarak gönderin.',
+            'Çok acil; Avrupa tarafında gün sonu kapanmadan almamız gerekiyor.',
+            'Teşekkürler,\nElise\nExternal Collaboration Office'
+          ]
+        },
+        en: {
+          fromName: 'Dr. Elise Martin',
+          fromEmail: 'elise.martin@eu-biocollab.org',
+          to: 'Project Coordinator',
+          subject: 'URGENT — confirmation of raw sequencing outputs and shipment plan',
+          sentAt: 'Friday, 19:42',
+          preview: 'PI approval can be completed on Monday; sending the files directly in this email thread tonight will be sufficient.',
+          body: [
+            'Hello,',
+            'Before tomorrow morning\'s management review, could you please share the following tonight?',
+            '• Latest raw FASTQ / sequencing outputs\n• Current supplier and order list\n• Sample shipment plan for the next two weeks',
+            'We can complete PI approval in the system on Monday; right now we only need to move quickly. The usual secure portal is not visible on my side, so replying directly to this email thread will be sufficient. If possible, please send the files as a compressed folder.',
+            'This is very urgent; we need it before close of business on the European side.',
+            'Thanks,\nElise\nExternal Collaboration Office'
+          ]
+        }
       },
       setting: ['Talep cuma akşamı geldi. PI seyahatte; proje koordinatörü hızlı cevap verilmesini istiyor.', 'The request arrived on a Friday evening. The PI is traveling, and the project coordinator wants a quick reply.'],
       current: ['Kimlik, yetki ve iş ihtiyacı doğrulanmadan paylaşım yapılması ciddi bir research security hatası olabilir.', 'Sharing before identity, authority, and business need are verified could be a major research-security failure.'],
@@ -673,6 +703,49 @@ const onboardingScenarioTitle = $('onboarding-scenario-title'), onboardingScenar
 const scoreEl = $('score'), stageEl = $('stage'), speedEl = $('speed'), evidenceEl = $('evidence'), coordinationEl = $('coordination'), riskEl = $('risk'), progressFill = $('progress-fill'), progressText = $('progress-text'), branchProgress = $('branch-progress'), alertText = $('alert-text'), streakBadge = $('streak-badge'), scenarioName = $('scenario-name'), timerBadge = $('timer-badge'), finalSummary = $('final-summary'), finalScores = $('final-scores'), finalBadge = $('final-badge'), trophyCase = $('trophy-case'), debriefList = $('debrief-list');
 const settingText = $('setting-text'), currentText = $('current-text'), changedText = $('changed-text'), developmentsList = $('developments-list'), optionsList = $('options-list');
 const emailSamplePanel = $('email-sample-panel'), emailSampleChip = $('email-sample-chip'), emailSampleTitle = $('email-sample-title'), emailSampleContent = $('email-sample-content');
+
+function escapeHtml(value='') {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function formatEmailBodyParagraphs(paragraphs = []) {
+  return paragraphs.map((paragraph) => `<p>${escapeHtml(paragraph).replace(/\n/g, '<br>')}</p>`).join('');
+}
+
+function renderEmailArtifact(sample) {
+  const labels = currentLanguage === 'tr'
+    ? { from: 'Kimden', to: 'Kime', subject: 'Konu', sentAt: 'Saat', preview: 'Önizleme' }
+    : { from: 'From', to: 'To', subject: 'Subject', sentAt: 'Sent', preview: 'Preview' };
+
+  return `
+    <div class="mail-artifact">
+      <div class="mail-window-bar">
+        <span class="mail-window-dot dot-red"></span>
+        <span class="mail-window-dot dot-yellow"></span>
+        <span class="mail-window-dot dot-green"></span>
+        <span class="mail-window-title">${escapeHtml(currentLanguage === 'tr' ? 'Şüpheli e-posta örneği' : 'Suspicious email sample')}</span>
+      </div>
+      <div class="mail-preview-banner">
+        <span class="mail-preview-label">${escapeHtml(labels.preview)}</span>
+        <strong>${escapeHtml(sample.preview || '')}</strong>
+      </div>
+      <div class="mail-header-grid">
+        <div class="mail-header-row"><span class="mail-label">${escapeHtml(labels.from)}</span><div class="mail-value"><strong>${escapeHtml(sample.fromName || '')}</strong><span>&lt;${escapeHtml(sample.fromEmail || '')}&gt;</span></div></div>
+        <div class="mail-header-row"><span class="mail-label">${escapeHtml(labels.to)}</span><div class="mail-value">${escapeHtml(sample.to || '')}</div></div>
+        <div class="mail-header-row"><span class="mail-label">${escapeHtml(labels.subject)}</span><div class="mail-value mail-subject">${escapeHtml(sample.subject || '')}</div></div>
+        <div class="mail-header-row"><span class="mail-label">${escapeHtml(labels.sentAt)}</span><div class="mail-value">${escapeHtml(sample.sentAt || '')}</div></div>
+      </div>
+      <div class="mail-body">
+        ${formatEmailBodyParagraphs(sample.body || [])}
+      </div>
+    </div>
+  `;
+}
 const accordionTriggers = [1,2,3].map((n)=>$(`accordion-trigger-${n}`)).filter(Boolean);
 function t(){ return staticText[currentLanguage]; } function clamp(v){ return Math.max(0, Math.min(100, v)); } function tr(v){ return v?.[currentLanguage] ?? v?.tr ?? v; }
 function toneText(value, type='body'){ if(value == null) return value; if(Array.isArray(value)) return value.map((item)=>toneText(item, type)); if(typeof value !== 'string' || currentTone === 'standard') return value; const isTr = currentLanguage === 'tr'; if(currentTone === 'dramatic'){ const prefixMap = isTr ? { title:'⚠️ ', summary:'Gerilim yükseliyor: ', alert:'ACİL // ', feedback:'Sahadaki sonuç: ', option:'Karar noktası: ', label:'Dramatik • ', body:'Baskı artıyor: ' } : { title:'⚠️ ', summary:'Tension rising: ', alert:'URGENT // ', feedback:'Field outcome: ', option:'Decision point: ', label:'Dramatic • ', body:'Pressure is building: ' }; return `${prefixMap[type] || prefixMap.body}${value}`; } const prefixMap = isTr ? { title:'Analitik çerçeve — ', summary:'Akademik özet: ', alert:'Operasyonel sinyal // ', feedback:'Değerlendirme: ', option:'Yanıt seçeneği: ', label:'Akademik • ', body:'Analitik not: ' } : { title:'Analytical framing — ', summary:'Academic summary: ', alert:'Operational signal // ', feedback:'Assessment: ', option:'Response option: ', label:'Academic • ', body:'Analytical note: ' }; return `${prefixMap[type] || prefixMap.body}${value}`; }
@@ -690,7 +763,7 @@ function startTimer(){ clearInterval(timer); timeLeft=30; updateTimerBadge(); ti
 function changedTextForNode(node){ if(node.changedByTone && state.history.length){ const prior = state.history[state.history.length-1].tone === 'positive' ? 'positive':'negative'; return toneText(tr(node.changedByTone[prior]), 'body'); } return toneText(tr(node.changed) || (currentLanguage==='tr'?'Önceki aşama kararı sonrasındaki etkiler bu noktada görünür hale gelecek.':'The impact of the previous-stage choice will become visible at this point.'), 'body'); }
 function setAccordionState(index, expanded){ const trigger = $(`accordion-trigger-${index}`); const panel = $(`accordion-panel-${index}`); if(!trigger || !panel) return; trigger.setAttribute('aria-expanded', expanded ? 'true' : 'false'); trigger.setAttribute('aria-label', expanded ? t().collapsePanel : t().expandPanel); panel.classList.toggle('hidden', !expanded); }
 function collapseAllAccordions(){ [1,2,3].forEach((index)=>setAccordionState(index, false)); }
-function renderEmailSample(node){ const sample = node.emailSample ? tr(node.emailSample) : ''; if(!sample){ emailSamplePanel.classList.add('hidden'); emailSampleContent.textContent=''; return; } emailSamplePanel.classList.remove('hidden'); emailSampleContent.textContent = sample; }
+function renderEmailSample(node){ const sample = node.emailSample ? tr(node.emailSample) : null; if(!sample){ emailSamplePanel.classList.add('hidden'); emailSampleContent.innerHTML=''; return; } emailSamplePanel.classList.remove('hidden'); emailSampleContent.innerHTML = renderEmailArtifact(sample); }
 function renderNode(){ const node=state.scenario.nodes[state.current]; nodeTitle.textContent = toneText(tr(node.title), 'title'); nodeText.textContent = toneText(tr(node.text), 'body'); alertText.textContent = toneText(`${t().liveAlertPrefix} ${tr(node.alert)}`, 'alert'); settingText.textContent = toneText(tr(node.setting), 'body'); currentText.textContent = toneText(tr(node.current), 'body'); changedText.textContent = changedTextForNode(node); developmentsList.innerHTML = tr(node.developments).map((item)=>`<li>${toneText(item, 'body')}</li>`).join(''); optionsList.innerHTML = tr(node.options).map((item)=>`<li>${toneText(item, 'option')}</li>`).join(''); renderEmailSample(node); collapseAllAccordions(); choicesEl.innerHTML=''; feedbackPanel.classList.add('hidden'); retryBtn.classList.add('hidden'); pendingNext=null; choicesEl.className = `choices choices-count-${Math.min(node.choices.length, 5)}`; node.choices.forEach((choice,index)=>{ const btn=document.createElement('button'); btn.className=`choice-btn ${choice.tone}`; btn.innerHTML=`<span class="choice-index">${String(index+1).padStart(2,'0')}</span><span class="choice-copy">${toneText(tr(choice.text), 'option')}</span>`; btn.addEventListener('click',()=>handleChoice(choice)); choicesEl.appendChild(btn); }); renderStats(); startTimer(); }
 function handleChoice(choice, autoSelected=false){ clearInterval(timer); const rewardLocked = !!state.lockedRewardNodes[state.current]; const deltas = ['score','speed','evidence','coordination','risk'].reduce((acc,key)=>{ acc[key] = rewardLocked && choice.tone==='positive' ? 0 : (choice.effects[key]||0); return acc; },{}); state.score += deltas.score; state.speed=clamp(state.speed+deltas.speed); state.evidence=clamp(state.evidence+deltas.evidence); state.coordination=clamp(state.coordination+deltas.coordination); state.risk=clamp(state.risk+deltas.risk); if(choice.tone==='positive'){ if(!rewardLocked) state.trophies.push(choice.badge); feedbackEmoji.textContent = rewardLocked ? '👀✅' : '🏅✨😎'; feedbackHeading.textContent = t().positive; rewardStrip.className='reward-strip positive'; rewardStrip.innerHTML = rewardLocked ? `<span>+ ${currentLanguage==='tr'?'Yol düzeltildi':'Path corrected'}</span><strong>${t().retryPenalty}</strong><span class="reward-badge">${toneText(tr(choice.badge), 'label')}</span>` : `<span>+ ${currentLanguage==='tr'?'Bonus':'Bonus'}</span><strong>${toneText(tr(choice.bonus), 'label')}</strong><span class="reward-badge">${toneText(tr(choice.badge), 'label')}</span>`; beep('positive'); } else if(choice.tone==='neutral'){ feedbackEmoji.textContent = autoSelected ? '⏰🟡📌' : '🟡🤔📌'; feedbackHeading.textContent = autoSelected ? t().timeout : t().neutral; rewardStrip.className='reward-strip neutral'; rewardStrip.innerHTML = `<span>± ${currentLanguage==='tr'?'Ara sonuç':'Mixed result'}</span><strong>${autoSelected ? (currentLanguage==='tr'?'⏱ Süre aşımı nedeniyle otomatik seçim':'⏱ Auto-selected after timeout') : toneText(tr(choice.bonus), 'label')}</strong><span class="reward-badge">${toneText(tr(choice.badge), 'label')}</span>`; if(!autoSelected) retryBtn.classList.remove('hidden'); state.lockedRewardNodes[state.current]=true; beep('negative'); } else { feedbackEmoji.textContent = autoSelected ? '⏰😢💧' : '😢🙃💧'; feedbackHeading.textContent = autoSelected ? t().timeout : t().negative; rewardStrip.className='reward-strip negative'; rewardStrip.innerHTML = `<span>− ${currentLanguage==='tr'?'Kayıp':'Loss'}</span><strong>${autoSelected ? (currentLanguage==='tr'?'⏱ Süre aşımı nedeniyle otomatik seçim':'⏱ Auto-selected after timeout') : toneText(tr(choice.bonus), 'label')}</strong><span class="reward-badge">${toneText(tr(choice.badge), 'label')}</span>`; if(!autoSelected) retryBtn.classList.remove('hidden'); state.lockedRewardNodes[state.current]=true; beep('negative'); }
   feedbackText.textContent = toneText(tr(choice.feedback), 'feedback'); feedbackPanel.classList.remove('hidden'); const idx=state.history.findIndex((x)=>x.node===state.current); const entry={ node:state.current, tone:choice.tone, badge:choice.badge, recovered:rewardLocked }; if(idx>=0) state.history[idx]=entry; else state.history.push(entry); pendingNext = choice.next; [...choicesEl.querySelectorAll('button')].forEach((btn)=>btn.disabled=true); renderStats(); }
