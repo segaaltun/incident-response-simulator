@@ -257,6 +257,8 @@ let state = initialState();
 let pendingNext = null;
 let timer = null;
 let timeLeft = 30;
+let soundEnabled = true;
+let currentLanguage = 'tr';
 
 const scenarioScreen = document.getElementById("scenario-screen");
 const onboardingScreen = document.getElementById("onboarding-screen");
@@ -267,6 +269,8 @@ const restartBtn = document.getElementById("restart-btn");
 const nextBtn = document.getElementById("next-btn");
 const fullscreenBtn = document.getElementById("fullscreen-btn");
 const presentationBtn = document.getElementById("presentation-btn");
+const languageBtn = document.getElementById("language-btn");
+const soundBtn = document.getElementById("sound-btn");
 const onboardingStartBtn = document.getElementById("onboarding-start-btn");
 const onboardingBackBtn = document.getElementById("onboarding-back-btn");
 const onboardingScenarioTitle = document.getElementById("onboarding-scenario-title");
@@ -297,8 +301,76 @@ const finalBadge = document.getElementById("final-badge");
 const trophyCase = document.getElementById("trophy-case");
 const debriefList = document.getElementById("debrief-list");
 
+const i18n = {
+  tr: {
+    continue: 'Devam Et',
+    start: 'Senaryoyu Başlat',
+    back: 'Geri Dön',
+    backToSelection: 'Senaryo Seçimine Dön',
+    fullscreen: '⛶ Sunum Modu',
+    fullscreenExit: '🡼 Sunum Modundan Çık',
+    presentation: '🎤 Projeksiyon Görünümü',
+    presentationOff: '🧾 Normal Görünüm',
+    soundOn: '🔊 Ses Açık',
+    soundOff: '🔇 Ses Kapalı',
+    lang: '🌐 EN',
+    timer: 'sn',
+    positive: 'Pozitif Kazanım',
+    negative: 'Riskli Sonuç',
+    timeout: 'Süre Doldu'
+  },
+  en: {
+    continue: 'Continue',
+    start: 'Start Scenario',
+    back: 'Back',
+    backToSelection: 'Return to Scenarios',
+    fullscreen: '⛶ Fullscreen',
+    fullscreenExit: '🡼 Exit Fullscreen',
+    presentation: '🎤 Projection View',
+    presentationOff: '🧾 Normal View',
+    soundOn: '🔊 Sound On',
+    soundOff: '🔇 Sound Off',
+    lang: '🌐 TR',
+    timer: 'sec',
+    positive: 'Positive Gain',
+    negative: 'Risk Outcome',
+    timeout: 'Time Expired'
+  }
+};
+
 function clamp(value) {
   return Math.max(0, Math.min(100, value));
+}
+
+function beep(type = 'positive') {
+  if (!soundEnabled) return;
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = type === 'positive' ? 880 : 220;
+    gain.gain.value = 0.03;
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.12);
+  } catch (e) {
+    console.error('sound error', e);
+  }
+}
+
+function applyLanguage() {
+  const t = i18n[currentLanguage];
+  nextBtn.textContent = t.continue;
+  onboardingStartBtn.textContent = t.start;
+  onboardingBackBtn.textContent = t.back;
+  restartBtn.textContent = t.backToSelection;
+  fullscreenBtn.textContent = document.fullscreenElement ? t.fullscreenExit : t.fullscreen;
+  presentationBtn.textContent = document.body.classList.contains('presentation-mode') ? t.presentationOff : t.presentation;
+  soundBtn.textContent = soundEnabled ? t.soundOn : t.soundOff;
+  languageBtn.textContent = t.lang;
+  updateTimerBadge();
 }
 
 function showScreen(screen) {
@@ -355,7 +427,7 @@ function renderStats() {
 }
 
 function updateTimerBadge() {
-  timerBadge.textContent = `⏱ ${timeLeft} sn`;
+  timerBadge.textContent = `⏱ ${timeLeft} ${i18n[currentLanguage].timer}`;
   timerBadge.classList.toggle('warning', timeLeft <= 10);
 }
 
@@ -411,14 +483,16 @@ function handleChoice(choice, autoSelected = false) {
   if (choice.tone === "positive") {
     state.trophies.push(choice.badge);
     feedbackEmoji.textContent = "🏅✨😎";
-    feedbackHeading.textContent = "Pozitif Kazanım";
+    feedbackHeading.textContent = i18n[currentLanguage].positive;
     rewardStrip.className = "reward-strip positive";
     rewardStrip.innerHTML = `<span>+ Bonus</span><strong>${choice.bonus}</strong><span class="reward-badge">${choice.badge}</span>`;
+    beep('positive');
   } else {
     feedbackEmoji.textContent = autoSelected ? "⏰😢💧" : "😢🙃💧";
-    feedbackHeading.textContent = autoSelected ? "Süre Doldu" : "Riskli Sonuç";
+    feedbackHeading.textContent = autoSelected ? i18n[currentLanguage].timeout : i18n[currentLanguage].negative;
     rewardStrip.className = "reward-strip negative";
-    rewardStrip.innerHTML = `<span>− Kayıp</span><strong>${autoSelected ? '⏱ Süre aşımı nedeniyle otomatik seçim' : choice.bonus}</strong><span class="reward-badge">${choice.badge}</span>`;
+    rewardStrip.innerHTML = `<span>− Kayıp</span><strong>${autoSelected ? '⏱ Auto-selected after timeout' : choice.bonus}</strong><span class="reward-badge">${choice.badge}</span>`;
+    beep('negative');
   }
 
   feedbackText.textContent = choice.feedback;
@@ -527,9 +601,31 @@ presentationBtn.addEventListener('click', () => {
 });
 
 document.addEventListener('fullscreenchange', () => {
-  if (!document.fullscreenElement) {
-    fullscreenBtn.textContent = '⛶ Sunum Modu';
+  applyLanguage();
+});
+
+languageBtn.addEventListener('click', () => {
+  currentLanguage = currentLanguage === 'tr' ? 'en' : 'tr';
+  applyLanguage();
+});
+
+soundBtn.addEventListener('click', () => {
+  soundEnabled = !soundEnabled;
+  applyLanguage();
+});
+
+document.addEventListener('keydown', (e) => {
+  if (gameScreen.classList.contains('active')) {
+    const buttons = [...choicesEl.querySelectorAll('button:not(:disabled)')];
+    if (['1','2','3'].includes(e.key)) {
+      const idx = Number(e.key) - 1;
+      if (buttons[idx]) buttons[idx].click();
+    }
+    if (e.key === 'Enter' && !feedbackPanel.classList.contains('hidden')) {
+      nextBtn.click();
+    }
   }
 });
 
 renderScenarioList();
+applyLanguage();

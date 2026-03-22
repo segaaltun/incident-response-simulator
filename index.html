@@ -41,7 +41,8 @@
     </header>
 
     <main class="card">
-      <section id="scenario-screen" class="screen active">
+      <section id="scenario-screen" class="screen active intro-screen">
+        <div class="title-slide-badge">Opening Slide</div>
         <div class="scenario-kicker">Scenario Selection</div>
         <div class="section-head">
           <div>
@@ -55,6 +56,8 @@
           <div class="toolbar-buttons">
             <button id="fullscreen-btn" class="secondary-btn">⛶ Sunum Modu</button>
             <button id="presentation-btn" class="secondary-btn">🎤 Projeksiyon Görünümü</button>
+            <button id="language-btn" class="secondary-btn">🌐 EN</button>
+            <button id="sound-btn" class="secondary-btn">🔊 Ses Açık</button>
           </div>
         </div>
         <div id="scenario-list" class="scenario-list"></div>
@@ -163,10 +166,12 @@
           </div>
           <div id="reward-strip" class="reward-strip"></div>
           <button id="next-btn" class="primary">Devam Et</button>
+          <div class="keyboard-hint">⌨️ 1-2-3 ile seçim yapabilir, Enter ile ilerleyebilirsiniz.</div>
         </section>
       </section>
 
-      <section id="end-screen" class="screen">
+      <section id="end-screen" class="screen outro-screen">
+        <div class="title-slide-badge">Closing Slide</div>
         <div class="scenario-kicker">Simulation Complete</div>
         <h2>Senaryo Tamamlandı</h2>
         <div id="final-badge" class="final-badge"></div>

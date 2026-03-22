@@ -142,6 +142,19 @@ h3 { font-size: 1.05rem; }
   flex-wrap: wrap;
 }
 
+.title-slide-badge {
+  display: inline-block;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255,138,61,0.22), rgba(255,95,210,0.20));
+  border: 1px solid rgba(255,255,255,0.12);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fff6ef;
+}
+
 .secondary-btn {
   border: 1px solid rgba(255,255,255,0.12);
   background: linear-gradient(135deg, rgba(68,199,255,0.18), rgba(143,91,255,0.18));
@@ -254,6 +267,11 @@ h3 { font-size: 1.05rem; }
 .choice-copy { display:block; line-height:1.5; }
 .feedback.hidden { display:none; }
 .feedback-emoji { font-size: 2rem; margin-bottom: 8px; }
+.keyboard-hint {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
 .feedback-tags { display:flex; flex-wrap:wrap; gap:10px; margin:14px 0 18px; }
 .feedback-tag {
   padding:8px 12px; border-radius:999px; font-size:0.82rem; color:#f5f3ff;
