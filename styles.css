@@ -367,6 +367,12 @@ h3 { font-size: 1.05rem; }
 .reward-badge {
   padding: 7px 10px; border-radius: 999px; background: rgba(255,255,255,0.10); font-size: 0.85rem;
 }
+.feedback-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
 .primary {
   background: linear-gradient(135deg, var(--orange) 0%, var(--pink) 38%, var(--purple) 70%, var(--blue) 100%);
   color:white; font-weight:800; max-width:320px; box-shadow: 0 14px 34px rgba(143,91,255,0.28), 0 8px 24px rgba(255,138,61,0.22);

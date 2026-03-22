@@ -498,6 +498,8 @@ const staticText = {
     negative: 'Riskli Sonuç',
     timeout: 'Süre Doldu',
     continue: 'Devam Et',
+    retry: 'Bu aşamayı düzelt',
+    retryPenalty: 'Puan cezası kalır; doğru yolu görürsünüz ama bonus alamazsınız.',
     start: 'Senaryoyu Başlat',
     back: 'Geri Dön',
     backToSelection: 'Senaryo Seçimine Dön',
@@ -573,6 +575,8 @@ const staticText = {
     negative: 'Risk Outcome',
     timeout: 'Time Expired',
     continue: 'Continue',
+    retry: 'Correct this stage',
+    retryPenalty: 'The score penalty stays; you can see the correct path, but you cannot earn the bonus anymore.',
     start: 'Start Scenario',
     back: 'Back',
     backToSelection: 'Return to Scenarios',
@@ -617,7 +621,9 @@ const initialState = () => ({
   coordination: 50,
   risk: 50,
   trophies: [],
-  history: []
+  history: [],
+  recoveredNodes: {},
+  lockedRewardNodes: {}
 });
 
 let state = initialState();
@@ -636,6 +642,7 @@ const endScreen = $('end-screen');
 const scenarioList = $('scenario-list');
 const restartBtn = $('restart-btn');
 const nextBtn = $('next-btn');
+const retryBtn = $('retry-btn');
 const fullscreenBtn = $('fullscreen-btn');
 const presentationBtn = $('presentation-btn');
 const languageBtn = $('language-btn');
@@ -761,9 +768,11 @@ function renderBranchProgress() {
       const hist = state.history[idx];
       const positive = hist?.tone === 'positive';
       if (!positive) cls += ' bad';
-      note = positive
-        ? (currentLanguage === 'tr' ? 'Olumlu yol seçildi' : 'Positive path selected')
-        : (currentLanguage === 'tr' ? 'Riskli yol seçildi' : 'Risk path selected');
+      note = hist?.recovered
+        ? (currentLanguage === 'tr' ? 'Düzeltildi, bonus kilitli' : 'Recovered, bonus locked')
+        : positive
+          ? (currentLanguage === 'tr' ? 'Olumlu yol seçildi' : 'Positive path selected')
+          : (currentLanguage === 'tr' ? 'Riskli yol seçildi' : 'Risk path selected');
     } else if (stepNumber === state.stage) {
       cls += ' active';
       note = currentLanguage === 'tr' ? 'Şu an bu aşamadasınız' : 'You are here now';
@@ -942,6 +951,7 @@ function renderNode() {
   pressureList.innerHTML = narrative.pressures.map((item) => `<li>${item}</li>`).join('');
   choicesEl.innerHTML = '';
   feedbackPanel.classList.add('hidden');
+  retryBtn.classList.add('hidden');
   pendingNext = null;
   node.choices.forEach((choice, index) => {
     const btn = document.createElement('button');
@@ -956,30 +966,46 @@ function renderNode() {
 
 function handleChoice(choice, autoSelected = false) {
   clearInterval(timer);
-  state.score += choice.effects.score || 0;
-  state.speed = clamp(state.speed + (choice.effects.speed || 0));
-  state.evidence = clamp(state.evidence + (choice.effects.evidence || 0));
-  state.coordination = clamp(state.coordination + (choice.effects.coordination || 0));
-  state.risk = clamp(state.risk + (choice.effects.risk || 0));
+  const rewardLocked = !!state.lockedRewardNodes[state.current];
+  const scoreDelta = rewardLocked && choice.tone === 'positive' ? 0 : (choice.effects.score || 0);
+  const speedDelta = rewardLocked && choice.tone === 'positive' ? 0 : (choice.effects.speed || 0);
+  const evidenceDelta = rewardLocked && choice.tone === 'positive' ? 0 : (choice.effects.evidence || 0);
+  const coordinationDelta = rewardLocked && choice.tone === 'positive' ? 0 : (choice.effects.coordination || 0);
+  const riskDelta = rewardLocked && choice.tone === 'positive' ? 0 : (choice.effects.risk || 0);
+
+  state.score += scoreDelta;
+  state.speed = clamp(state.speed + speedDelta);
+  state.evidence = clamp(state.evidence + evidenceDelta);
+  state.coordination = clamp(state.coordination + coordinationDelta);
+  state.risk = clamp(state.risk + riskDelta);
 
   if (choice.tone === 'positive') {
-    state.trophies.push(choice.badge);
-    feedbackEmoji.textContent = '🏅✨😎';
+    if (!rewardLocked) state.trophies.push(choice.badge);
+    feedbackEmoji.textContent = rewardLocked ? '👀✅' : '🏅✨😎';
     feedbackHeading.textContent = t().positive;
     rewardStrip.className = 'reward-strip positive';
-    rewardStrip.innerHTML = `<span>+ Bonus</span><strong>${tr(choice.bonus)}</strong><span class="reward-badge">${tr(choice.badge)}</span>`;
+    rewardStrip.innerHTML = rewardLocked
+      ? `<span>+ Yol düzeltildi</span><strong>${t().retryPenalty}</strong><span class="reward-badge">${tr(choice.badge)}</span>`
+      : `<span>+ Bonus</span><strong>${tr(choice.bonus)}</strong><span class="reward-badge">${tr(choice.badge)}</span>`;
     beep('positive');
   } else {
     feedbackEmoji.textContent = autoSelected ? '⏰😢💧' : '😢🙃💧';
     feedbackHeading.textContent = autoSelected ? t().timeout : t().negative;
     rewardStrip.className = 'reward-strip negative';
     rewardStrip.innerHTML = `<span>− Kayıp</span><strong>${autoSelected ? (currentLanguage === 'tr' ? '⏱ Süre aşımı nedeniyle otomatik seçim' : '⏱ Auto-selected after timeout') : tr(choice.bonus)}</strong><span class="reward-badge">${tr(choice.badge)}</span>`;
+    if (!autoSelected) {
+      retryBtn.classList.remove('hidden');
+    }
+    state.lockedRewardNodes[state.current] = true;
     beep('negative');
   }
 
   feedbackText.textContent = tr(choice.feedback);
   feedbackPanel.classList.remove('hidden');
-  state.history.push({ node: state.current, tone: choice.tone, badge: choice.badge });
+  const existingIdx = state.history.findIndex((x) => x.node === state.current);
+  const historyEntry = { node: state.current, tone: choice.tone, badge: choice.badge, recovered: rewardLocked };
+  if (existingIdx >= 0) state.history[existingIdx] = historyEntry;
+  else state.history.push(historyEntry);
   pendingNext = choice.next;
   [...choicesEl.querySelectorAll('button')].forEach((btn) => (btn.disabled = true));
   renderStats();
@@ -1071,6 +1097,7 @@ function applyStaticText() {
   $('onboarding-expected-list').innerHTML = t().onboardingExpected.split('|').map((x) => `<li>${x}</li>`).join('');
 
   nextBtn.textContent = t().continue;
+  retryBtn.textContent = t().retry;
   onboardingStartBtn.textContent = t().start;
   onboardingBackBtn.textContent = t().back;
   restartBtn.textContent = t().backToSelection;
@@ -1137,6 +1164,12 @@ languageBtn.addEventListener('click', () => {
 soundBtn.addEventListener('click', () => {
   soundEnabled = !soundEnabled;
   applyStaticText();
+});
+
+retryBtn.addEventListener('click', () => {
+  state.recoveredNodes[state.current] = true;
+  feedbackPanel.classList.add('hidden');
+  renderNode();
 });
 
 themeBtn.addEventListener('click', () => {
