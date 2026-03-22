@@ -11,30 +11,26 @@
     <header class="hero">
       <div class="hero-grid">
         <div>
-          <p class="eyebrow">Türkiye Biosecurity Workshop 2026 • Gamified Simulation</p>
-          <h1>Incident Response: What Would You Do?</h1>
-          <p class="subtitle">
-            Biyogüvenlik ve siber güvenlik ekseninde, kurumsal karar kalitesini,
-            eskalasyon doğruluğunu ve delil bütünlüğünü görünür kılmak için tasarlanmış
-            çok senaryolu, puanlamalı profesyonel workshop demosu.
-          </p>
+          <p class="eyebrow" id="eyebrow"></p>
+          <h1 id="hero-title"></h1>
+          <p class="subtitle" id="hero-subtitle"></p>
         </div>
         <div class="hero-status">
           <div class="status-card critical">
-            <span class="status-label">Threat Level</span>
-            <strong>Dynamic</strong>
+            <span class="status-label" id="threat-label"></span>
+            <strong id="threat-value"></strong>
           </div>
           <div class="status-card">
-            <span class="status-label">Mode</span>
-            <strong>Interactive Presentation</strong>
+            <span class="status-label" id="mode-label"></span>
+            <strong id="mode-value"></strong>
           </div>
           <div class="status-card">
-            <span class="status-label">Scenarios</span>
-            <strong>5 Branching Cases</strong>
+            <span class="status-label" id="scenarios-label"></span>
+            <strong id="scenarios-value"></strong>
           </div>
           <div class="status-card">
-            <span class="status-label">Presenter</span>
-            <strong>Prof. Dr. Ahmet Altun</strong>
+            <span class="status-label" id="presenter-label"></span>
+            <strong id="presenter-value"></strong>
           </div>
         </div>
       </div>
@@ -42,83 +38,65 @@
 
     <main class="card">
       <section id="scenario-screen" class="screen active intro-screen">
-        <div class="title-slide-badge">Opening Slide</div>
-        <div class="scenario-kicker">Scenario Selection</div>
+        <div class="title-slide-badge" id="opening-slide-label"></div>
+        <div class="scenario-kicker" id="scenario-kicker"></div>
         <div class="section-head">
           <div>
-            <h2>Bir senaryo seçin</h2>
-            <p class="muted-copy">
-              Her senaryo, araştırma güvenliği ve incident response pratiğinin farklı bir yönünü temsil eder.
-              Katılımcılar seçtikleri senaryoda adım adım karar verir; doğru seçimler bonus puan,
-              rozet ve pozitif geri bildirimlerle ödüllendirilir.
-            </p>
+            <h2 id="choose-scenario-title"></h2>
+            <p class="muted-copy" id="choose-scenario-desc"></p>
           </div>
           <div class="toolbar-buttons">
-            <button id="fullscreen-btn" class="secondary-btn">⛶ Sunum Modu</button>
-            <button id="presentation-btn" class="secondary-btn">🎤 Projeksiyon Görünümü</button>
-            <button id="language-btn" class="secondary-btn">🌐 EN</button>
-            <button id="sound-btn" class="secondary-btn">🔊 Ses Açık</button>
+            <button id="fullscreen-btn" class="secondary-btn"></button>
+            <button id="presentation-btn" class="secondary-btn"></button>
+            <button id="language-btn" class="secondary-btn"></button>
+            <button id="sound-btn" class="secondary-btn"></button>
+            <button id="theme-btn" class="secondary-btn"></button>
           </div>
         </div>
         <div id="scenario-list" class="scenario-list"></div>
       </section>
 
       <section id="onboarding-screen" class="screen">
-        <div class="scenario-kicker">How to Play</div>
+        <div class="scenario-kicker" id="onboarding-kicker"></div>
         <h2 id="onboarding-scenario-title">Senaryo</h2>
         <p id="onboarding-scenario-summary" class="muted-copy"></p>
 
         <div class="onboarding-grid">
           <div class="onboarding-card">
-            <h3>Oyun mantığı</h3>
-            <ul>
-              <li>Her senaryo 4 aşamalıdır.</li>
-              <li>Her aşamada 1 karar verirsiniz.</li>
-              <li>Doğru seçimler puan ve rozet kazandırır.</li>
-              <li>Yanlış seçimler risk puanı ve kaliteyi düşürür.</li>
-            </ul>
+            <h3 id="onboarding-logic-title"></h3>
+            <ul id="onboarding-logic-list"></ul>
           </div>
           <div class="onboarding-card">
-            <h3>Değerlendirme eksenleri</h3>
-            <ul>
-              <li>Hız</li>
-              <li>Kanıt bütünlüğü</li>
-              <li>Kurumsal koordinasyon</li>
-              <li>Risk kontrolü</li>
-            </ul>
+            <h3 id="onboarding-axes-title"></h3>
+            <ul id="onboarding-axes-list"></ul>
           </div>
           <div class="onboarding-card">
-            <h3>Beklenen yaklaşım</h3>
-            <ul>
-              <li>Containment + delil koruma dengesi</li>
-              <li>Doğru eskalasyon</li>
-              <li>SOP ve governance uyumu</li>
-              <li>Olaydan öğrenme ve debrief</li>
-            </ul>
+            <h3 id="onboarding-expected-title"></h3>
+            <ul id="onboarding-expected-list"></ul>
           </div>
         </div>
 
         <div class="end-actions">
-          <button id="onboarding-start-btn" class="primary">Senaryoyu Başlat</button>
-          <button id="onboarding-back-btn" class="secondary-btn">Geri Dön</button>
+          <button id="onboarding-start-btn" class="primary"></button>
+          <button id="onboarding-back-btn" class="secondary-btn"></button>
         </div>
       </section>
 
       <section id="game-screen" class="screen">
         <div class="topbar">
           <div>
-            <span class="label">Toplam Skor</span>
+            <span class="label" id="score-label"></span>
             <strong id="score">0</strong>
           </div>
           <div>
-            <span class="label">Aşama</span>
+            <span class="label" id="stage-label"></span>
             <strong id="stage">1</strong>
           </div>
         </div>
 
         <div class="progress-wrap">
           <div class="progress-head">
-            <span>Response Progress</span>
+            <span id="progress-label"></span>
             <span id="progress-text">1 / 4</span>
           </div>
           <div class="progress-bar">
@@ -132,14 +110,14 @@
         </div>
 
         <div class="meters">
-          <div class="meter"><span>Hız</span><strong id="speed">50</strong></div>
-          <div class="meter"><span>Kanıt Koruma</span><strong id="evidence">50</strong></div>
-          <div class="meter"><span>Koordinasyon</span><strong id="coordination">50</strong></div>
-          <div class="meter"><span>Risk Kontrolü</span><strong id="risk">50</strong></div>
+          <div class="meter"><span id="speed-label"></span><strong id="speed">50</strong></div>
+          <div class="meter"><span id="evidence-label"></span><strong id="evidence">50</strong></div>
+          <div class="meter"><span id="coordination-label"></span><strong id="coordination">50</strong></div>
+          <div class="meter"><span id="risk-label"></span><strong id="risk">50</strong></div>
         </div>
 
         <div class="badge-row">
-          <div class="live-badge" id="streak-badge">🏅 Bonus fırsatı aktif</div>
+          <div class="live-badge" id="streak-badge"></div>
           <div class="live-badge secondary" id="scenario-name">Scenario</div>
           <div class="live-badge secondary" id="presenter-badge">Prof. Dr. Ahmet Altun</div>
           <div class="live-badge secondary timer-badge" id="timer-badge">⏱ 30 sn</div>
@@ -151,39 +129,39 @@
         </article>
 
         <section>
-          <h3>Ne yaparsınız?</h3>
+          <h3 id="choice-title"></h3>
           <div id="choices" class="choices"></div>
         </section>
 
         <section id="feedback-panel" class="feedback hidden">
           <div id="feedback-emoji" class="feedback-emoji">🏅</div>
-          <h3 id="feedback-heading">Geri Bildirim</h3>
+          <h3 id="feedback-heading"></h3>
           <p id="feedback-text"></p>
           <div class="feedback-tags">
-            <span class="feedback-tag">Containment</span>
-            <span class="feedback-tag">Evidence Integrity</span>
-            <span class="feedback-tag">Institutional Coordination</span>
+            <span class="feedback-tag" id="feedback-tag-1"></span>
+            <span class="feedback-tag" id="feedback-tag-2"></span>
+            <span class="feedback-tag" id="feedback-tag-3"></span>
           </div>
           <div id="reward-strip" class="reward-strip"></div>
-          <button id="next-btn" class="primary">Devam Et</button>
-          <div class="keyboard-hint">⌨️ 1-2-3 ile seçim yapabilir, Enter ile ilerleyebilirsiniz.</div>
+          <button id="next-btn" class="primary"></button>
+          <div class="keyboard-hint" id="keyboard-hint"></div>
         </section>
       </section>
 
       <section id="end-screen" class="screen outro-screen">
-        <div class="title-slide-badge">Closing Slide</div>
-        <div class="scenario-kicker">Simulation Complete</div>
-        <h2>Senaryo Tamamlandı</h2>
+        <div class="title-slide-badge" id="closing-slide-label"></div>
+        <div class="scenario-kicker" id="complete-kicker"></div>
+        <h2 id="completed-title"></h2>
         <div id="final-badge" class="final-badge"></div>
         <p id="final-summary"></p>
         <div id="final-scores" class="meters final"></div>
         <div id="trophy-case" class="trophy-case"></div>
         <div class="debrief-box">
-          <h3>Kısa Debrief</h3>
+          <h3 id="debrief-title"></h3>
           <ul id="debrief-list"></ul>
         </div>
         <div class="end-actions">
-          <button id="restart-btn" class="primary">Senaryo Seçimine Dön</button>
+          <button id="restart-btn" class="primary"></button>
         </div>
       </section>
     </main>
