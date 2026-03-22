@@ -181,6 +181,11 @@ h3 { font-size: 1.05rem; }
   transform: translateY(-2px);
 }
 
+button:focus-visible {
+  outline: 3px solid rgba(68, 199, 255, 0.8);
+  outline-offset: 3px;
+}
+
 .scenario-list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -454,6 +459,20 @@ body.presentation-mode .topbar strong { font-size: 1.7rem; }
 
 @media (max-width: 960px) {
   .hero-grid, .scenario-list, .onboarding-grid, .detail-grid, .branch-progress { grid-template-columns: 1fr; }
+  .section-head { flex-direction: column; }
+  .meters { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .app { padding: 20px 14px 40px; }
+  .hero, .card { padding: 20px; border-radius: 22px; }
+  .topbar, .meters, .scenario-list { grid-template-columns: 1fr; }
+  .primary { max-width: none; }
+}
+us: 22px; }
+  .topbar, .meters, .scenario-list { grid-template-columns: 1fr; }
+  .primary { max-width: none; }
+}
+1fr; }
   .section-head { flex-direction: column; }
   .meters { grid-template-columns: repeat(2, 1fr); }
 }
