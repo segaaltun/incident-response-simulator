@@ -348,15 +348,315 @@ function buildInsiderNodes() { return {
   })
 }; }
 
+const supplementalStageChoices = {
+  'after-hours-access': {
+    start: [
+      extraOption(
+        'VPN oturumunu kontrollü askıya al, kullanıcının cihazına dokunmadan önce canlı artefakt toplama ve çağrı zincirini başlat.',
+        'Suspend the VPN session in a controlled way, initiate live-artifact collection, and start the call chain before touching the user device.',
+        'neutral',
+        '🟡 Kısmi containment',
+        '🟡 Partial containment',
+        'Aktif oturumu kısmen sınırlar ama hesap/uç nokta izolasyonu kadar güçlü değildir; yine de düşünülmüş bir ara adımdır.',
+        'This partly constrains the live session but is not as strong as full account/endpoint isolation; still, it is a considered intermediate move.',
+        { score: 6, speed: 6, evidence: 8, coordination: 4, risk: 2 },
+        'Measured Hold'
+      )
+    ],
+    comms: [
+      extraOption(
+        'Önce yalnızca enstitü yöneticisini bilgilendir; diğer paydaşları teknik kapsam netleşince dahil et.',
+        'Inform only the institute director first; bring in other stakeholders once the technical scope is clearer.',
+        'neutral',
+        '🟡 Dar eskalasyon',
+        '🟡 Narrow escalation',
+        'Bazı liderlik görünürlüğü sağlar ama hukuk, araştırma güvenliği ve veri sahibi boyutlarını geciktirebilir.',
+        'This creates some leadership visibility but may delay legal, research-security, and data-owner involvement.',
+        { score: 4, speed: 4, evidence: 0, coordination: -2, risk: 0 },
+        'Leader First'
+      )
+    ],
+    evidence: [
+      extraOption(
+        'Önce paylaşım erişimini daraltıp kritik dosyaları salt okunur korumaya al; adli kopyayı hemen ardından planlı pencerede al.',
+        'Tighten share access and place critical files under read-only protection first; then take forensic images in the planned window.',
+        'neutral',
+        '🟡 Korumalı bekletme',
+        '🟡 Protected holding pattern',
+        'Hizmet baskısını azaltır ve bazı kanıtları korur; yine de tam zincir-of-custody yaklaşımı kadar güçlü değildir.',
+        'This reduces service pressure and protects some evidence, though it is not as strong as a full chain-of-custody approach.',
+        { score: 8, speed: 2, evidence: 10, coordination: 2, risk: 4 },
+        'Access Freeze'
+      )
+    ],
+    decision: [
+      extraOption(
+        'Sınıflandırmayı “muhtemel maruziyet” olarak geçici tut, genişletilmiş izleme ve hızlandırılmış düzeltmeleri başlat, dış bildirimi kısa süreli yeniden değerlendirme koşuluna bağla.',
+        'Keep the classification temporarily at “probable exposure,” launch expanded monitoring and accelerated remediation, and tie any external notice to a near-term reassessment.',
+        'neutral',
+        '🟡 Temkinli kapanış',
+        '🟡 Cautious closure',
+        'Belirsizlik varsa savunulabilir olabilir; ancak karar netliğini ve paydaş beklentilerini bir miktar geciktirir.',
+        'This can be defensible under uncertainty, but it delays decisiveness and may slow stakeholder closure.',
+        { score: 8, speed: 0, evidence: 4, coordination: 4, risk: 6 },
+        'Guarded Classifier'
+      )
+    ]
+  },
+  'usb-transfer': {
+    start: [
+      extraOption(
+        'Kullanıcıdan USB’yi hemen fiziksel teslim etmesini iste, istasyonu açık bırak ama gözlem altına al; kayıt açmayı kullanıcı gelene kadar ertele.',
+        'Require the user to surrender the USB immediately, keep the workstation powered but monitored, and delay formal recording until the user arrives.',
+        'neutral',
+        '🟡 Gecikmeli kontrol',
+        '🟡 Delayed control',
+        'Fiziksel medyayı geri çağırmaya çalışır ama resmi kayıt ve erken kurumsal görünürlük gecikir.',
+        'This tries to recover the physical media, but formal recording and early institutional visibility are delayed.',
+        { score: 4, speed: 2, evidence: 4, coordination: 0, risk: 2 },
+        'USB Recall'
+      )
+    ],
+    comms: [
+      extraOption(
+        'Önce yalnızca PI ve veri sahibini bilgilendir; governance ekibini transfer kapsamı netleşirse çağır.',
+        'Inform only the PI and data owner first; involve governance teams if transfer scope becomes clearer.',
+        'neutral',
+        '🟡 Kısmi paydaş seti',
+        '🟡 Partial stakeholder set',
+        'Bazı iş bağlamını korur ama olayın sözleşme ve politika boyutunu eksik bırakabilir.',
+        'This preserves some business context but may underserve the contractual and policy dimensions of the event.',
+        { score: 4, speed: 4, evidence: 0, coordination: -2, risk: 0 },
+        'PI First'
+      )
+    ],
+    evidence: [
+      extraOption(
+        'Önce USB artefaktları ve arşiv adlarını inceleyip hızlı bir ön kapsam çıkar; tam rekonstrüksiyonu gün sonuna yetiştir.',
+        'Review USB artifacts and archive names first for a quick preliminary scope, then complete the full reconstruction by end of day.',
+        'neutral',
+        '🟡 Ön kapsam bonusu',
+        '🟡 Preliminary scoping bonus',
+        'Hızlı bir yön verir ama tam korelasyon yapılmadan alınan kararları kısmen zayıf bırakabilir.',
+        'It gives direction quickly, but decisions made before full correlation remain somewhat weaker.',
+        { score: 6, speed: 6, evidence: 6, coordination: 2, risk: 2 },
+        'Fast Scope'
+      )
+    ],
+    decision: [
+      extraOption(
+        'Sadece yüksek riskli klasörler için USB engeli ve ek denetim getir; laboratuvar genelinde sert kısıtları ikinci faza bırak.',
+        'Introduce USB blocking and extra auditing only for high-risk folders, while leaving stricter lab-wide controls for a second phase.',
+        'neutral',
+        '🟡 Hedefli sıkılaştırma',
+        '🟡 Targeted tightening',
+        'Operasyonu daha az zorlar; ancak kültürel ve süreçsel boşluklar tamamen kapanmayabilir.',
+        'This is less disruptive operationally, though cultural and process gaps may remain only partly addressed.',
+        { score: 10, speed: 6, evidence: 2, coordination: 4, risk: 8 },
+        'Scoped Controls'
+      )
+    ]
+  },
+  'partner-email': {
+    start: [
+      extraOption(
+        'Talebe kısa bir “resmi doğrulama sonrası döneceğiz” yanıtı ver ve hiçbir veri paylaşmadan bağımsız teyit sürecini başlat.',
+        'Reply briefly that you will respond after formal verification, without sharing any data, and start the independent confirmation process.',
+        'neutral',
+        '🟡 Kontrollü gecikme',
+        '🟡 Controlled delay',
+        'İlişki tonunu korurken veri riskini azaltır; yine de tam kayıt açma kadar kurumsal güç sağlamaz.',
+        'This preserves relationship tone while reducing data risk, though it is not as institutionally strong as opening the full record immediately.',
+        { score: 10, speed: 8, evidence: 4, coordination: 4, risk: 8 },
+        'Verified Reply'
+      )
+    ],
+    comms: [
+      extraOption(
+        'Araştırma güvenliği ve veri sahibini hemen dahil et; hukuk/uyum birimini ise ihracat kontrolü veya sözleşme etkisi doğrulanırsa ekle.',
+        'Bring in research security and the data owner immediately; add legal/compliance if export-control or contractual impact is confirmed.',
+        'neutral',
+        '🟡 Aşamalı due diligence',
+        '🟡 Staged due diligence',
+        'Mantıklı bir orta yol olabilir, ancak bazı kurumsal kontrolleri biraz geç devreye sokar.',
+        'This can be a sensible middle path, though some institutional controls are activated a bit later.',
+        { score: 8, speed: 6, evidence: 2, coordination: 6, risk: 4 },
+        'Phased Review'
+      )
+    ],
+    evidence: [
+      extraOption(
+        'Önce resmi telefon doğrulamasını tamamla, ardından header analizini ikinci adımda derinleştir.',
+        'Complete the official phone verification first, then deepen the header analysis as a second step.',
+        'neutral',
+        '🟡 Bağlamsal doğrulama',
+        '🟡 Context-first verification',
+        'Bağımsız doğrulama açısından güçlüdür ama teknik kanıtı gecikmeli tamamladığı için bütüncül yaklaşım kadar iyi değildir.',
+        'This is strong from an independent-verification angle, but because technical evidence comes later, it is weaker than the fully integrated approach.',
+        { score: 8, speed: 4, evidence: 8, coordination: 4, risk: 6 },
+        'Phone Verify'
+      )
+    ],
+    decision: [
+      extraOption(
+        'Talebi resmi kanaldan yeniden göndermelerini iste, bu vakayı kayıt altına al ve SOP görünürlüğünü artıran kısa bir iç duyuru yap.',
+        'Ask them to resubmit through an official channel, record the case, and publish a short internal note that reinforces SOP visibility.',
+        'neutral',
+        '🟡 Güvenli yeniden yönlendirme',
+        '🟡 Safe redirection',
+        'İlişkiyi koruyan iyi bir pratik yanıt üretir; ancak tam doğrulanmış paylaşım/ret ayrımı kadar net değildir.',
+        'This produces a practical, relationship-preserving response, though it is not as crisp as the full verified-share vs. formal-refusal decision.',
+        { score: 12, speed: 6, evidence: 4, coordination: 8, risk: 8 },
+        'Channel Reset'
+      )
+    ]
+  },
+  'lab-device': {
+    start: [
+      extraOption(
+        'Cihazı internete kapatıp yalnızca yerel laboratuvar ağına bırak, operasyonun etkisini izlerken log toplamayı sürdür.',
+        'Block the device from the internet but leave it on the local lab network while monitoring operational impact and continuing log collection.',
+        'neutral',
+        '🟡 Sınırlı izolasyon',
+        '🟡 Limited isolation',
+        'Dış trafiği azaltır ama segment içi yayılım ihtimalini tamamen ortadan kaldırmaz.',
+        'This reduces outbound risk but does not fully eliminate the possibility of segment-level spread.',
+        { score: 10, speed: 8, evidence: 8, coordination: 2, risk: 6 },
+        'Vendor Cutoff'
+      )
+    ],
+    comms: [
+      extraOption(
+        'Biosafety ve cihaz sahibini hemen dahil et; geniş segment taramasını kısa teknik triyaj sonrası başlat.',
+        'Involve biosafety and the device owner immediately, then begin the wider segment scan after a short technical triage.',
+        'neutral',
+        '🟡 Kademeli koordinasyon',
+        '🟡 Phased coordination',
+        'Operasyonel hassasiyeti tanır; ancak tam ortak karar akışı kadar güçlü bir rol netliği sağlamaz.',
+        'This recognizes operational sensitivity, though it does not provide role clarity as strongly as a full shared decision flow.',
+        { score: 8, speed: 6, evidence: 2, coordination: 8, risk: 4 },
+        'Triage Council'
+      )
+    ],
+    evidence: [
+      extraOption(
+        'Ağ izi ve bakım geçmişini önce eşleştir, son kullanıcı/teknisyen akışını ikinci dalga incelemeye bırak.',
+        'Correlate network traces and maintenance history first, leaving end-user/technician flow to the second wave of review.',
+        'neutral',
+        '🟡 Kısmi çok kaynaklı analiz',
+        '🟡 Partial multi-source review',
+        'İyi bir başlangıçtır ama kullanıcı ve değişiklik yönetimi boyutunu geciktirdiği için tam resmi biraz geç tamamlar.',
+        'This is a solid start, but it delays the user and change-management dimensions and thus completes the full picture later.',
+        { score: 8, speed: 4, evidence: 10, coordination: 2, risk: 4 },
+        'Network First'
+      )
+    ],
+    decision: [
+      extraOption(
+        'Önce vendor erişim kuralları ve değişiklik kaydı zorunluluğunu uygula; segmentasyonu bakım penceresine bağlayarak aşamalı tamamla.',
+        'Implement vendor-access rules and mandatory change logging first, then complete segmentation in phases tied to maintenance windows.',
+        'neutral',
+        '🟡 Aşamalı dayanıklılık',
+        '🟡 Phased resilience',
+        'Gerçekçi uygulanabilirlik sağlar ama riski daha uzun bir döneme yayarak kapatır.',
+        'This improves practical deployability, but it closes risk over a longer period.',
+        { score: 12, speed: 6, evidence: 2, coordination: 8, risk: 8 },
+        'Phased Hardening'
+      )
+    ]
+  },
+  'insider-sharing': {
+    start: [
+      extraOption(
+        'Koordinatörle özel görüşüp paylaşımı dondur, bağlantı alıcılarını kayda geçir ve resmi kaydı toplantı sonrasına bırak.',
+        'Meet privately with the coordinator, freeze the share, record the recipient set, and postpone the formal record until after the meeting.',
+        'neutral',
+        '🟡 Yumuşak fren',
+        '🟡 Soft brake',
+        'Psikolojik güvenliği korur ama resmi görünürlük ve zaman damgalı kayıt biraz gecikir.',
+        'This preserves psychological safety, but formal visibility and time-stamped recording are delayed somewhat.',
+        { score: 8, speed: 6, evidence: 6, coordination: 4, risk: 4 },
+        'Private Freeze'
+      )
+    ],
+    comms: [
+      extraOption(
+        'Yönetici, süreç sahibi ve koordinatör arasında küçük bir çekirdek görüşme yap; HR’yi yalnızca ekip iklimi belirgin zarar görürse ekle.',
+        'Hold a small core review with management, the process owner, and the coordinator; involve HR only if team climate shows clear damage.',
+        'neutral',
+        '🟡 Çekirdek değerlendirme',
+        '🟡 Core review',
+        'Savunmacılığı azaltabilir ama kurum çapındaki öğrenme ve çok boyutlu görünürlük biraz sınırlı kalır.',
+        'This may reduce defensiveness, but broader institutional learning and multidimensional visibility remain somewhat limited.',
+        { score: 8, speed: 6, evidence: 2, coordination: 6, risk: 4 },
+        'Core Circle'
+      )
+    ],
+    evidence: [
+      extraOption(
+        'Önce alıcı kapsamı ve link erişimlerini doğrula, içerik versiyon analizini ikinci dalga incelemeye bırak.',
+        'Confirm recipient scope and link opens first, leaving content-version analysis for a second review wave.',
+        'neutral',
+        '🟡 Sınırlı bağlam toplama',
+        '🟡 Limited context gathering',
+        'Kritik maruziyet yönünü hızla netleştirir ama SOP sapmasının tam mekanizmasını daha geç açıklar.',
+        'This clarifies the exposure side quickly, but explains the full SOP divergence mechanism later.',
+        { score: 8, speed: 6, evidence: 8, coordination: 2, risk: 4 },
+        'Recipient Scope'
+      )
+    ],
+    decision: [
+      extraOption(
+        'Kısa vadede güvenli paylaşım kanalı zorunluluğu getir, ardından acil paylaşım yolu ve eğitim paketini 30 gün içinde tamamla.',
+        'Mandate the secure sharing channel in the short term, then finish the urgent-sharing path and training package within 30 days.',
+        'neutral',
+        '🟡 Aşamalı kültürel düzeltme',
+        '🟡 Phased cultural remediation',
+        'Pratik ve uygulanabilir bir kapanıştır; ancak tam, eşzamanlı kültürel güçlendirme kadar etkili değildir.',
+        'This is practical and deployable, though not as strong as a full simultaneous cultural-strengthening package.',
+        { score: 12, speed: 6, evidence: 2, coordination: 8, risk: 8 },
+        '30-Day Reset'
+      )
+    ]
+  }
+};
+
+function extraOption(trText, enText, tone, trBonus, enBonus, trFeedback, enFeedback, effects, badge) {
+  return {
+    text: { tr: trText, en: enText },
+    tone,
+    bonus: { tr: trBonus, en: enBonus },
+    feedback: { tr: trFeedback, en: enFeedback },
+    effects,
+    badge: { tr: badge, en: badge }
+  };
+}
+
+function enrichScenarioOptions(catalog) {
+  catalog.forEach((scenario) => {
+    const stageMap = supplementalStageChoices[scenario.id];
+    if (!stageMap) return;
+    Object.entries(stageMap).forEach(([nodeKey, extras]) => {
+      const node = scenario.nodes[nodeKey];
+      if (!node || !Array.isArray(node.choices)) return;
+      extras.forEach((extra) => node.choices.push(extra));
+      node.options.tr = node.choices.map((choice) => choice.text.tr);
+      node.options.en = node.choices.map((choice) => choice.text.en);
+    });
+  });
+}
+
+enrichScenarioOptions(scenarioCatalog);
+
 const staticText = {
   tr: {
     eyebrow: 'Türkiye Biosecurity Workshop 2026 • Gamified Simulation',
     title: 'Incident Response: What Would You Do?',
     subtitle: 'Biyogüvenlik ve siber güvenlik ekseninde; kurumsal karar kalitesini, eskalasyon doğruluğunu ve delil bütünlüğünü görünür kılmak için tasarlanmış çok senaryolu, puanlamalı profesyonel workshop demosu.',
-    threatLevel: 'Threat Level', mode: 'Mode', scenarios: 'Scenarios', presenter: 'Presenter', dynamic: 'Dynamic', interactivePresentation: 'Interactive Presentation', branchingCases: '5 Branching Cases', presenterName: 'Prof. Dr. Ahmet Altun', openingSlide: 'Opening Slide', closingSlide: 'Closing Slide', scenarioSelection: 'Scenario Selection', chooseScenario: 'Bir senaryo seçin', chooseScenarioDesc: 'Her senaryo 4 aşamalı, çok adımlı ve gerçekçi bir incident simulation akışı içerir. Her aşamada önce bağlamı okur, sonra karar verirsiniz; puan, rozet, süre baskısı ve düzeltme mekanikleri korunur.', toneStandard: 'Standart', toneDramatic: 'Dramatik', toneAcademic: 'Akademik', howToPlay: 'How to Play', gameLogic: 'Oyun mantığı', axes: 'Değerlendirme eksenleri', expectedApproach: 'Beklenen yaklaşım', complete: 'Simulation Complete', completed: 'Senaryo Tamamlandı', shortDebrief: 'Kısa Debrief', branchProgress: 'Branch Progress', branchPath: 'Yol', stageSummaryTitle: 'Aşama Özeti', settingTitle: 'Ortam / Bağlam', currentTitle: 'Mevcut Durum', changedTitle: 'Önceki Kararın Etkisi', developmentsTitle: 'Yeni Gelişmeler ve Bulgular', optionsTitle: 'Şu Anki Seçenekler', score: 'Toplam Skor', stage: 'Aşama', speed: 'Hız', evidence: 'Kanıt Koruma', coordination: 'Koordinasyon', risk: 'Risk Kontrolü', progress: 'Response Progress', whatWouldYouDo: 'Ne yaparsınız?', keyboardHint: '⌨️ 1-2-3 ile seçim yapabilir, Enter ile ilerleyebilirsiniz.', bonusActive: '🏅 Bonus fırsatı aktif', positive: 'Pozitif Kazanım', negative: 'Riskli Sonuç', timeout: 'Süre Doldu', continue: 'Devam Et', retry: 'Bu aşamayı düzelt', retryPenalty: 'Puan cezası kalır; doğru yolu görürsünüz ama bonus alamazsınız.', start: 'Senaryoyu Başlat', back: 'Geri Dön', backToSelection: 'Senaryo Seçimine Dön', fullscreen: '⛶ Sunum Modu', fullscreenExit: '🡼 Sunum Modundan Çık', presentation: '🎤 Projeksiyon Görünümü', presentationOff: '🧾 Normal Görünüm', soundOn: '🔊 Ses Açık', soundOff: '🔇 Ses Kapalı', lang: '🌐 EN', themeDark: '🌙 Dark', themeLight: '☀️ Light', timer: 'sn', scenarioMeta: '4 aşamalı • puanlamalı • rozetli', onboardingSummary: 'Her senaryo 4 aşamalıdır.|Her aşamada 1 karar verirsiniz.|Doğru seçimler puan ve rozet kazandırır.|Yanlış seçimler risk puanı ve kaliteyi düşürür.', onboardingAxes: 'Hız|Kanıt bütünlüğü|Kurumsal koordinasyon|Risk kontrolü', onboardingExpected: 'Containment + delil koruma dengesi|Doğru eskalasyon|SOP ve governance uyumu|Olaydan öğrenme ve debrief', debrief: ['Containment ile delil bütünlüğü arasında denge kurmak temel başarı ölçütüdür.','Doğru eskalasyon, teknik doğruluk kadar kurumsal güven üretir.','SOP, governance ve audit trail eksikliği iyi teknik kararları bile zayıflatabilir.','Her incident response süreci, debrief ile kurumsal öğrenmeye çevrilmelidir.'], tags: ['Containment', 'Evidence Integrity', 'Institutional Coordination'], noBadge: '😢 Bu turda rozet kazanılamadı', finalHigh: 'Çok güçlü bir performans. Hız, delil bütünlüğü, koordinasyon ve risk kontrolü dengeli ve profesyonel biçimde yönetildi.', finalMid: 'Genel olarak güçlü bir performans. Bazı karar noktalarında yönetişim ve olay sınıflandırması daha da rafine edilebilir.', finalLow: 'Bu senaryoda kritik zafiyetler oluştu. Gecikme, eksik koordinasyon veya delil kaybı olay etkisini büyütmüş olabilir.', elite: 'Elite Response Lead 🏆', mid: 'Operational Coordinator 🧠', low: 'High-Risk Path 😢', liveAlertPrefix: 'Canlı uyarı akışı:'
+    threatLevel: 'Threat Level', mode: 'Mode', scenarios: 'Scenarios', presenter: 'Presenter', dynamic: 'Dynamic', interactivePresentation: 'Interactive Presentation', branchingCases: '5 Branching Cases', presenterName: 'Prof. Dr. Ahmet Altun', openingSlide: 'Opening Slide', closingSlide: 'Closing Slide', scenarioSelection: 'Scenario Selection', chooseScenario: 'Bir senaryo seçin', chooseScenarioDesc: 'Her senaryo 4 aşamalı, çok adımlı ve gerçekçi bir incident simulation akışı içerir. Her aşamada önce bağlamı okur, sonra karar verirsiniz; puan, rozet, süre baskısı ve düzeltme mekanikleri korunur.', toneStandard: 'Standart', toneDramatic: 'Dramatik', toneAcademic: 'Akademik', howToPlay: 'How to Play', gameLogic: 'Oyun mantığı', axes: 'Değerlendirme eksenleri', expectedApproach: 'Beklenen yaklaşım', complete: 'Simulation Complete', completed: 'Senaryo Tamamlandı', shortDebrief: 'Kısa Debrief', branchProgress: 'Branch Progress', branchPath: 'Yol', stageSummaryTitle: 'Aşama Özeti', settingTitle: 'Ortam / Bağlam', currentTitle: 'Mevcut Durum', changedTitle: 'Önceki Kararın Etkisi', developmentsTitle: 'Yeni Gelişmeler ve Bulgular', optionsTitle: 'Şu Anki Seçenekler', score: 'Toplam Skor', stage: 'Aşama', speed: 'Hız', evidence: 'Kanıt Koruma', coordination: 'Koordinasyon', risk: 'Risk Kontrolü', progress: 'Response Progress', whatWouldYouDo: 'Ne yaparsınız?', keyboardHint: '⌨️ 1-5 ile seçim yapabilir, Enter ile ilerleyebilirsiniz.', bonusActive: '🏅 Bonus fırsatı aktif', positive: 'Pozitif Kazanım', negative: 'Riskli Sonuç', neutral: 'Ara Yol / Kısmi Sonuç', timeout: 'Süre Doldu', continue: 'Devam Et', retry: 'Bu aşamayı düzelt', retryPenalty: 'Puan cezası kalır; doğru yolu görürsünüz ama bonus alamazsınız.', start: 'Senaryoyu Başlat', back: 'Geri Dön', backToSelection: 'Senaryo Seçimine Dön', fullscreen: '⛶ Sunum Modu', fullscreenExit: '🡼 Sunum Modundan Çık', presentation: '🎤 Projeksiyon Görünümü', presentationOff: '🧾 Normal Görünüm', soundOn: '🔊 Ses Açık', soundOff: '🔇 Ses Kapalı', lang: '🌐 EN', themeDark: '🌙 Dark', themeLight: '☀️ Light', timer: 'sn', scenarioMeta: '4 aşamalı • puanlamalı • rozetli', onboardingSummary: 'Her senaryo 4 aşamalıdır.|Her aşamada 1 karar verirsiniz.|Doğru seçimler puan ve rozet kazandırır.|Yanlış seçimler risk puanı ve kaliteyi düşürür.', onboardingAxes: 'Hız|Kanıt bütünlüğü|Kurumsal koordinasyon|Risk kontrolü', onboardingExpected: 'Containment + delil koruma dengesi|Doğru eskalasyon|SOP ve governance uyumu|Olaydan öğrenme ve debrief', debrief: ['Containment ile delil bütünlüğü arasında denge kurmak temel başarı ölçütüdür.','Doğru eskalasyon, teknik doğruluk kadar kurumsal güven üretir.','SOP, governance ve audit trail eksikliği iyi teknik kararları bile zayıflatabilir.','Her incident response süreci, debrief ile kurumsal öğrenmeye çevrilmelidir.'], tags: ['Containment', 'Evidence Integrity', 'Institutional Coordination'], noBadge: '😢 Bu turda rozet kazanılamadı', finalHigh: 'Çok güçlü bir performans. Hız, delil bütünlüğü, koordinasyon ve risk kontrolü dengeli ve profesyonel biçimde yönetildi.', finalMid: 'Genel olarak güçlü bir performans. Bazı karar noktalarında yönetişim ve olay sınıflandırması daha da rafine edilebilir.', finalLow: 'Bu senaryoda kritik zafiyetler oluştu. Gecikme, eksik koordinasyon veya delil kaybı olay etkisini büyütmüş olabilir.', elite: 'Elite Response Lead 🏆', mid: 'Operational Coordinator 🧠', low: 'High-Risk Path 😢', liveAlertPrefix: 'Canlı uyarı akışı:'
   },
   en: {
-    eyebrow: 'Türkiye Biosecurity Workshop 2026 • Gamified Simulation', title: 'Incident Response: What Would You Do?', subtitle: 'A multi-scenario, scored workshop demo designed to make institutional decision quality, escalation accuracy, and evidence integrity visible at the intersection of biosecurity and cybersecurity.', threatLevel: 'Threat Level', mode: 'Mode', scenarios: 'Scenarios', presenter: 'Presenter', dynamic: 'Dynamic', interactivePresentation: 'Interactive Presentation', branchingCases: '5 Branching Cases', presenterName: 'Prof. Dr. Ahmet Altun', openingSlide: 'Opening Slide', closingSlide: 'Closing Slide', scenarioSelection: 'Scenario Selection', chooseScenario: 'Choose a scenario', chooseScenarioDesc: 'Each scenario is a 4-stage, realistic, multi-step incident simulation. At every step you first absorb the context, then make a decision; scoring, badges, time pressure, and retry mechanics are preserved.', toneStandard: 'Standard', toneDramatic: 'Dramatic', toneAcademic: 'Academic', howToPlay: 'How to Play', gameLogic: 'Game Logic', axes: 'Evaluation Axes', expectedApproach: 'Expected Approach', complete: 'Simulation Complete', completed: 'Scenario Complete', shortDebrief: 'Short Debrief', branchProgress: 'Branch Progress', branchPath: 'Path', stageSummaryTitle: 'Stage Summary', settingTitle: 'Setting / Context', currentTitle: 'Current Situation', changedTitle: 'What Changed From the Previous Choice', developmentsTitle: 'New Developments and Findings', optionsTitle: 'Current Options', score: 'Total Score', stage: 'Stage', speed: 'Speed', evidence: 'Evidence Integrity', coordination: 'Coordination', risk: 'Risk Control', progress: 'Response Progress', whatWouldYouDo: 'What would you do?', keyboardHint: '⌨️ Use 1-2-3 to select options and Enter to continue.', bonusActive: '🏅 Bonus opportunity active', positive: 'Positive Gain', negative: 'Risk Outcome', timeout: 'Time Expired', continue: 'Continue', retry: 'Correct this stage', retryPenalty: 'The score penalty stays; you can see the correct path, but you cannot earn the bonus anymore.', start: 'Start Scenario', back: 'Back', backToSelection: 'Return to Scenarios', fullscreen: '⛶ Fullscreen', fullscreenExit: '🡼 Exit Fullscreen', presentation: '🎤 Projection View', presentationOff: '🧾 Normal View', soundOn: '🔊 Sound On', soundOff: '🔇 Sound Off', lang: '🌐 TR', themeDark: '🌙 Dark', themeLight: '☀️ Light', timer: 'sec', scenarioMeta: '4 stages • scored • badge-based', onboardingSummary: 'Each scenario has 4 stages.|You make 1 decision at each stage.|Correct choices earn points and badges.|Poor choices reduce risk performance and quality.', onboardingAxes: 'Speed|Evidence integrity|Institutional coordination|Risk control', onboardingExpected: 'Balance containment and evidence preservation|Correct escalation|SOP and governance alignment|Learning and debrief', debrief: ['Balancing containment and evidence integrity is a core success metric.','Correct escalation builds institutional trust as much as technical accuracy.','Weak SOP, governance, and audit trail design can undermine otherwise good technical decisions.','Every incident response process should be converted into institutional learning through debrief.'], tags: ['Containment', 'Evidence Integrity', 'Institutional Coordination'], noBadge: '😢 No badges were earned in this round', finalHigh: 'A very strong performance. Speed, evidence integrity, coordination, and risk control were managed in a balanced and professional way.', finalMid: 'Overall a strong performance. Governance and incident classification could be refined further at some decision points.', finalLow: 'Critical weaknesses emerged in this scenario. Delay, poor coordination, or evidence loss may have amplified the impact.', elite: 'Elite Response Lead 🏆', mid: 'Operational Coordinator 🧠', low: 'High-Risk Path 😢', liveAlertPrefix: 'Live alert feed:'
+    eyebrow: 'Türkiye Biosecurity Workshop 2026 • Gamified Simulation', title: 'Incident Response: What Would You Do?', subtitle: 'A multi-scenario, scored workshop demo designed to make institutional decision quality, escalation accuracy, and evidence integrity visible at the intersection of biosecurity and cybersecurity.', threatLevel: 'Threat Level', mode: 'Mode', scenarios: 'Scenarios', presenter: 'Presenter', dynamic: 'Dynamic', interactivePresentation: 'Interactive Presentation', branchingCases: '5 Branching Cases', presenterName: 'Prof. Dr. Ahmet Altun', openingSlide: 'Opening Slide', closingSlide: 'Closing Slide', scenarioSelection: 'Scenario Selection', chooseScenario: 'Choose a scenario', chooseScenarioDesc: 'Each scenario is a 4-stage, realistic, multi-step incident simulation. At every step you first absorb the context, then make a decision; scoring, badges, time pressure, and retry mechanics are preserved.', toneStandard: 'Standard', toneDramatic: 'Dramatic', toneAcademic: 'Academic', howToPlay: 'How to Play', gameLogic: 'Game Logic', axes: 'Evaluation Axes', expectedApproach: 'Expected Approach', complete: 'Simulation Complete', completed: 'Scenario Complete', shortDebrief: 'Short Debrief', branchProgress: 'Branch Progress', branchPath: 'Path', stageSummaryTitle: 'Stage Summary', settingTitle: 'Setting / Context', currentTitle: 'Current Situation', changedTitle: 'What Changed From the Previous Choice', developmentsTitle: 'New Developments and Findings', optionsTitle: 'Current Options', score: 'Total Score', stage: 'Stage', speed: 'Speed', evidence: 'Evidence Integrity', coordination: 'Coordination', risk: 'Risk Control', progress: 'Response Progress', whatWouldYouDo: 'What would you do?', keyboardHint: '⌨️ Use 1-5 to select options and Enter to continue.', bonusActive: '🏅 Bonus opportunity active', positive: 'Positive Gain', negative: 'Risk Outcome', neutral: 'Partial / Mixed Outcome', timeout: 'Time Expired', continue: 'Continue', retry: 'Correct this stage', retryPenalty: 'The score penalty stays; you can see the correct path, but you cannot earn the bonus anymore.', start: 'Start Scenario', back: 'Back', backToSelection: 'Return to Scenarios', fullscreen: '⛶ Fullscreen', fullscreenExit: '🡼 Exit Fullscreen', presentation: '🎤 Projection View', presentationOff: '🧾 Normal View', soundOn: '🔊 Sound On', soundOff: '🔇 Sound Off', lang: '🌐 TR', themeDark: '🌙 Dark', themeLight: '☀️ Light', timer: 'sec', scenarioMeta: '4 stages • scored • badge-based', onboardingSummary: 'Each scenario has 4 stages.|You make 1 decision at each stage.|Correct choices earn points and badges.|Poor choices reduce risk performance and quality.', onboardingAxes: 'Speed|Evidence integrity|Institutional coordination|Risk control', onboardingExpected: 'Balance containment and evidence preservation|Correct escalation|SOP and governance alignment|Learning and debrief', debrief: ['Balancing containment and evidence integrity is a core success metric.','Correct escalation builds institutional trust as much as technical accuracy.','Weak SOP, governance, and audit trail design can undermine otherwise good technical decisions.','Every incident response process should be converted into institutional learning through debrief.'], tags: ['Containment', 'Evidence Integrity', 'Institutional Coordination'], noBadge: '😢 No badges were earned in this round', finalHigh: 'A very strong performance. Speed, evidence integrity, coordination, and risk control were managed in a balanced and professional way.', finalMid: 'Overall a strong performance. Governance and incident classification could be refined further at some decision points.', finalLow: 'Critical weaknesses emerged in this scenario. Delay, poor coordination, or evidence loss may have amplified the impact.', elite: 'Elite Response Lead 🏆', mid: 'Operational Coordinator 🧠', low: 'High-Risk Path 😢', liveAlertPrefix: 'Live alert feed:'
   }
 };
 
@@ -382,11 +682,11 @@ function renderBranchProgress(){ const labels={ tr:['İlk Alarm','Eskalasyon','D
 function renderStats(){ scoreEl.textContent=state.score; stageEl.textContent=state.stage; speedEl.textContent=state.speed; evidenceEl.textContent=state.evidence; coordinationEl.textContent=state.coordination; riskEl.textContent=state.risk; progressFill.style.width=`${Math.min((state.stage/4)*100,100)}%`; progressText.textContent=`${state.stage} / 4`; streakBadge.textContent = state.trophies.length ? `🏅 ${toneText(tr(state.trophies[state.trophies.length-1]), 'label')}` : toneText(t().bonusActive, 'label'); renderBranchProgress(); }
 function startTimer(){ clearInterval(timer); timeLeft=30; updateTimerBadge(); timer=setInterval(()=>{ timeLeft-=1; updateTimerBadge(); if(timeLeft<=0){ clearInterval(timer); const node=state.scenario.nodes[state.current]; const firstNegative=node.choices.find((c)=>c.tone==='negative')||node.choices[0]; handleChoice(firstNegative,true); } },1000); }
 function changedTextForNode(node){ if(node.changedByTone && state.history.length){ const prior = state.history[state.history.length-1].tone === 'positive' ? 'positive':'negative'; return toneText(tr(node.changedByTone[prior]), 'body'); } return toneText(tr(node.changed) || (currentLanguage==='tr'?'Önceki aşama kararı sonrasındaki etkiler bu noktada görünür hale gelecek.':'The impact of the previous-stage choice will become visible at this point.'), 'body'); }
-function renderNode(){ const node=state.scenario.nodes[state.current]; nodeTitle.textContent = toneText(tr(node.title), 'title'); nodeText.textContent = toneText(tr(node.text), 'body'); alertText.textContent = toneText(`${t().liveAlertPrefix} ${tr(node.alert)}`, 'alert'); settingText.textContent = toneText(tr(node.setting), 'body'); currentText.textContent = toneText(tr(node.current), 'body'); changedText.textContent = changedTextForNode(node); developmentsList.innerHTML = tr(node.developments).map((item)=>`<li>${toneText(item, 'body')}</li>`).join(''); optionsList.innerHTML = tr(node.options).map((item)=>`<li>${toneText(item, 'option')}</li>`).join(''); choicesEl.innerHTML=''; feedbackPanel.classList.add('hidden'); retryBtn.classList.add('hidden'); pendingNext=null; node.choices.forEach((choice,index)=>{ const btn=document.createElement('button'); btn.className=`choice-btn ${choice.tone}`; btn.innerHTML=`<span class="choice-index">0${index+1}</span><span class="choice-copy">${toneText(tr(choice.text), 'option')}</span>`; btn.addEventListener('click',()=>handleChoice(choice)); choicesEl.appendChild(btn); }); renderStats(); startTimer(); }
-function handleChoice(choice, autoSelected=false){ clearInterval(timer); const rewardLocked = !!state.lockedRewardNodes[state.current]; const deltas = ['score','speed','evidence','coordination','risk'].reduce((acc,key)=>{ acc[key] = rewardLocked && choice.tone==='positive' ? 0 : (choice.effects[key]||0); return acc; },{}); state.score += deltas.score; state.speed=clamp(state.speed+deltas.speed); state.evidence=clamp(state.evidence+deltas.evidence); state.coordination=clamp(state.coordination+deltas.coordination); state.risk=clamp(state.risk+deltas.risk); if(choice.tone==='positive'){ if(!rewardLocked) state.trophies.push(choice.badge); feedbackEmoji.textContent = rewardLocked ? '👀✅' : '🏅✨😎'; feedbackHeading.textContent = t().positive; rewardStrip.className='reward-strip positive'; rewardStrip.innerHTML = rewardLocked ? `<span>+ ${currentLanguage==='tr'?'Yol düzeltildi':'Path corrected'}</span><strong>${t().retryPenalty}</strong><span class="reward-badge">${toneText(tr(choice.badge), 'label')}</span>` : `<span>+ ${currentLanguage==='tr'?'Bonus':'Bonus'}</span><strong>${toneText(tr(choice.bonus), 'label')}</strong><span class="reward-badge">${toneText(tr(choice.badge), 'label')}</span>`; beep('positive'); } else { feedbackEmoji.textContent = autoSelected ? '⏰😢💧' : '😢🙃💧'; feedbackHeading.textContent = autoSelected ? t().timeout : t().negative; rewardStrip.className='reward-strip negative'; rewardStrip.innerHTML = `<span>− ${currentLanguage==='tr'?'Kayıp':'Loss'}</span><strong>${autoSelected ? (currentLanguage==='tr'?'⏱ Süre aşımı nedeniyle otomatik seçim':'⏱ Auto-selected after timeout') : toneText(tr(choice.bonus), 'label')}</strong><span class="reward-badge">${toneText(tr(choice.badge), 'label')}</span>`; if(!autoSelected) retryBtn.classList.remove('hidden'); state.lockedRewardNodes[state.current]=true; beep('negative'); }
+function renderNode(){ const node=state.scenario.nodes[state.current]; nodeTitle.textContent = toneText(tr(node.title), 'title'); nodeText.textContent = toneText(tr(node.text), 'body'); alertText.textContent = toneText(`${t().liveAlertPrefix} ${tr(node.alert)}`, 'alert'); settingText.textContent = toneText(tr(node.setting), 'body'); currentText.textContent = toneText(tr(node.current), 'body'); changedText.textContent = changedTextForNode(node); developmentsList.innerHTML = tr(node.developments).map((item)=>`<li>${toneText(item, 'body')}</li>`).join(''); optionsList.innerHTML = tr(node.options).map((item)=>`<li>${toneText(item, 'option')}</li>`).join(''); choicesEl.innerHTML=''; feedbackPanel.classList.add('hidden'); retryBtn.classList.add('hidden'); pendingNext=null; choicesEl.className = `choices choices-count-${Math.min(node.choices.length, 5)}`; node.choices.forEach((choice,index)=>{ const btn=document.createElement('button'); btn.className=`choice-btn ${choice.tone}`; btn.innerHTML=`<span class="choice-index">${String(index+1).padStart(2,'0')}</span><span class="choice-copy">${toneText(tr(choice.text), 'option')}</span>`; btn.addEventListener('click',()=>handleChoice(choice)); choicesEl.appendChild(btn); }); renderStats(); startTimer(); }
+function handleChoice(choice, autoSelected=false){ clearInterval(timer); const rewardLocked = !!state.lockedRewardNodes[state.current]; const deltas = ['score','speed','evidence','coordination','risk'].reduce((acc,key)=>{ acc[key] = rewardLocked && choice.tone==='positive' ? 0 : (choice.effects[key]||0); return acc; },{}); state.score += deltas.score; state.speed=clamp(state.speed+deltas.speed); state.evidence=clamp(state.evidence+deltas.evidence); state.coordination=clamp(state.coordination+deltas.coordination); state.risk=clamp(state.risk+deltas.risk); if(choice.tone==='positive'){ if(!rewardLocked) state.trophies.push(choice.badge); feedbackEmoji.textContent = rewardLocked ? '👀✅' : '🏅✨😎'; feedbackHeading.textContent = t().positive; rewardStrip.className='reward-strip positive'; rewardStrip.innerHTML = rewardLocked ? `<span>+ ${currentLanguage==='tr'?'Yol düzeltildi':'Path corrected'}</span><strong>${t().retryPenalty}</strong><span class="reward-badge">${toneText(tr(choice.badge), 'label')}</span>` : `<span>+ ${currentLanguage==='tr'?'Bonus':'Bonus'}</span><strong>${toneText(tr(choice.bonus), 'label')}</strong><span class="reward-badge">${toneText(tr(choice.badge), 'label')}</span>`; beep('positive'); } else if(choice.tone==='neutral'){ feedbackEmoji.textContent = autoSelected ? '⏰🟡📌' : '🟡🤔📌'; feedbackHeading.textContent = autoSelected ? t().timeout : t().neutral; rewardStrip.className='reward-strip neutral'; rewardStrip.innerHTML = `<span>± ${currentLanguage==='tr'?'Ara sonuç':'Mixed result'}</span><strong>${autoSelected ? (currentLanguage==='tr'?'⏱ Süre aşımı nedeniyle otomatik seçim':'⏱ Auto-selected after timeout') : toneText(tr(choice.bonus), 'label')}</strong><span class="reward-badge">${toneText(tr(choice.badge), 'label')}</span>`; if(!autoSelected) retryBtn.classList.remove('hidden'); state.lockedRewardNodes[state.current]=true; beep('negative'); } else { feedbackEmoji.textContent = autoSelected ? '⏰😢💧' : '😢🙃💧'; feedbackHeading.textContent = autoSelected ? t().timeout : t().negative; rewardStrip.className='reward-strip negative'; rewardStrip.innerHTML = `<span>− ${currentLanguage==='tr'?'Kayıp':'Loss'}</span><strong>${autoSelected ? (currentLanguage==='tr'?'⏱ Süre aşımı nedeniyle otomatik seçim':'⏱ Auto-selected after timeout') : toneText(tr(choice.bonus), 'label')}</strong><span class="reward-badge">${toneText(tr(choice.badge), 'label')}</span>`; if(!autoSelected) retryBtn.classList.remove('hidden'); state.lockedRewardNodes[state.current]=true; beep('negative'); }
   feedbackText.textContent = toneText(tr(choice.feedback), 'feedback'); feedbackPanel.classList.remove('hidden'); const idx=state.history.findIndex((x)=>x.node===state.current); const entry={ node:state.current, tone:choice.tone, badge:choice.badge, recovered:rewardLocked }; if(idx>=0) state.history[idx]=entry; else state.history.push(entry); pendingNext = choice.next; [...choicesEl.querySelectorAll('button')].forEach((btn)=>btn.disabled=true); renderStats(); }
 function finishGame(){ showScreen(endScreen); const avg=Math.round((state.speed+state.evidence+state.coordination+state.risk)/4); let badge=t().low, verdict=t().finalLow; if(avg>=80 && state.score>=80){ badge=t().elite; verdict=t().finalHigh; } else if(avg>=60){ badge=t().mid; verdict=t().finalMid; } finalBadge.textContent=`${toneText(tr(state.scenario.name), 'title')} • ${badge}`; finalSummary.textContent=toneText(verdict, 'feedback'); finalScores.innerHTML=`<div class="meter"><span>${t().score}</span><strong>${state.score}</strong></div><div class="meter"><span>${t().speed}</span><strong>${state.speed}</strong></div><div class="meter"><span>${t().evidence}</span><strong>${state.evidence}</strong></div><div class="meter"><span>${t().coordination}</span><strong>${state.coordination}</strong></div><div class="meter"><span>${t().risk}</span><strong>${state.risk}</strong></div>`; debriefList.innerHTML = t().debrief.map((item)=>`<li>${toneText(item, 'body')}</li>`).join(''); trophyCase.innerHTML=''; if(state.trophies.length){ state.trophies.forEach((badge)=>{ const item=document.createElement('div'); item.className='trophy-item'; item.textContent=`🏅 ${toneText(tr(badge), 'label')}`; trophyCase.appendChild(item); }); } else { const item=document.createElement('div'); item.className='trophy-item muted'; item.textContent=t().noBadge; trophyCase.appendChild(item); } }
 function applyStaticText(){ $('eyebrow').textContent=toneText(t().eyebrow, 'label'); $('hero-title').textContent=toneText(t().title, 'title'); $('hero-subtitle').textContent=toneText(t().subtitle, 'summary'); $('threat-label').textContent=t().threatLevel; $('mode-label').textContent=t().mode; $('scenarios-label').textContent=t().scenarios; $('presenter-label').textContent=t().presenter; $('threat-value').textContent=toneText(t().dynamic, 'label'); $('mode-value').textContent=toneText(t().interactivePresentation, 'label'); $('scenarios-value').textContent=t().branchingCases; $('presenter-value').textContent=t().presenterName; $('opening-slide-label').textContent=t().openingSlide; $('scenario-kicker').textContent=t().scenarioSelection; $('choose-scenario-title').textContent=t().chooseScenario; $('choose-scenario-desc').textContent=toneText(t().chooseScenarioDesc, 'summary'); $('onboarding-kicker').textContent=t().howToPlay; $('onboarding-logic-title').textContent=t().gameLogic; $('onboarding-axes-title').textContent=t().axes; $('onboarding-expected-title').textContent=t().expectedApproach; $('complete-kicker').textContent=t().complete; $('completed-title').textContent=t().completed; $('debrief-title').textContent=t().shortDebrief; $('branch-progress-label').textContent=t().branchProgress; $('branch-path-label').textContent=t().branchPath; $('stage-summary-title').textContent=t().stageSummaryTitle; $('setting-title').textContent=t().settingTitle; $('current-title').textContent=t().currentTitle; $('changed-title').textContent=t().changedTitle; $('developments-title').textContent=t().developmentsTitle; $('options-title').textContent=t().optionsTitle; $('score-label').textContent=t().score; $('stage-label').textContent=t().stage; $('speed-label').textContent=t().speed; $('evidence-label').textContent=t().evidence; $('coordination-label').textContent=t().coordination; $('risk-label').textContent=t().risk; $('progress-label').textContent=t().progress; $('choice-title').textContent=t().whatWouldYouDo; $('keyboard-hint').textContent=t().keyboardHint; $('feedback-tag-1').textContent=t().tags[0]; $('feedback-tag-2').textContent=t().tags[1]; $('feedback-tag-3').textContent=t().tags[2]; $('closing-slide-label').textContent=t().closingSlide; $('onboarding-logic-list').innerHTML=t().onboardingSummary.split('|').map((x)=>`<li>${toneText(x, 'body')}</li>`).join(''); $('onboarding-axes-list').innerHTML=t().onboardingAxes.split('|').map((x)=>`<li>${toneText(x, 'body')}</li>`).join(''); $('onboarding-expected-list').innerHTML=t().onboardingExpected.split('|').map((x)=>`<li>${toneText(x, 'body')}</li>`).join(''); nextBtn.textContent=t().continue; retryBtn.textContent=t().retry; onboardingStartBtn.textContent=t().start; onboardingBackBtn.textContent=t().back; restartBtn.textContent=t().backToSelection; fullscreenBtn.textContent=document.fullscreenElement?t().fullscreenExit:t().fullscreen; presentationBtn.textContent=document.body.classList.contains('presentation-mode')?t().presentationOff:t().presentation; soundBtn.textContent=soundEnabled?t().soundOn:t().soundOff; languageBtn.textContent=t().lang; toneBtn.textContent=toneButtonLabel(); updateTheme(); updateTimerBadge(); renderScenarioList(); if(state.scenario){ onboardingScenarioTitle.textContent=toneText(tr(state.scenario.name), 'title'); onboardingScenarioSummary.textContent=toneText(tr(state.scenario.summary), 'summary'); scenarioName.textContent=toneText(tr(state.scenario.name), 'title'); if(gameScreen.classList.contains('active')) renderNode(); if(endScreen.classList.contains('active')) finishGame(); } }
 nextBtn.addEventListener('click',()=>{ if(!pendingNext) return; if(pendingNext==='end'){ finishGame(); return; } state.current=pendingNext; state.stage+=1; renderNode(); });
-restartBtn.addEventListener('click',()=>{ state=initialState(); showScreen(scenarioScreen); applyStaticText(); }); onboardingStartBtn.addEventListener('click',startScenario); onboardingBackBtn.addEventListener('click',()=>{ state=initialState(); showScreen(scenarioScreen); applyStaticText(); }); fullscreenBtn.addEventListener('click', async()=>{ try{ if(!document.fullscreenElement) await document.documentElement.requestFullscreen(); else await document.exitFullscreen(); applyStaticText(); } catch{} }); document.addEventListener('fullscreenchange',applyStaticText); presentationBtn.addEventListener('click',()=>{ document.body.classList.toggle('presentation-mode'); applyStaticText(); }); languageBtn.addEventListener('click',()=>{ currentLanguage = currentLanguage==='tr'?'en':'tr'; applyStaticText(); }); toneBtn.addEventListener('click',()=>{ currentTone = currentTone==='standard' ? 'dramatic' : currentTone==='dramatic' ? 'academic' : 'standard'; applyStaticText(); }); soundBtn.addEventListener('click',()=>{ soundEnabled=!soundEnabled; applyStaticText(); }); themeBtn.addEventListener('click',()=>{ currentTheme = currentTheme==='dark'?'light':'dark'; applyStaticText(); }); retryBtn.addEventListener('click',()=>{ const node=state.scenario.nodes[state.current]; const positive=node.choices.find((c)=>c.tone==='positive')||node.choices[0]; handleChoice(positive); }); document.addEventListener('keydown',(e)=>{ if(!gameScreen.classList.contains('active')) return; if(feedbackPanel.classList.contains('hidden')){ if(['1','2','3'].includes(e.key)){ const btns=[...choicesEl.querySelectorAll('button:not([disabled])')]; btns[Number(e.key)-1]?.click(); } } else if(e.key==='Enter'){ nextBtn.click(); } });
+restartBtn.addEventListener('click',()=>{ state=initialState(); showScreen(scenarioScreen); applyStaticText(); }); onboardingStartBtn.addEventListener('click',startScenario); onboardingBackBtn.addEventListener('click',()=>{ state=initialState(); showScreen(scenarioScreen); applyStaticText(); }); fullscreenBtn.addEventListener('click', async()=>{ try{ if(!document.fullscreenElement) await document.documentElement.requestFullscreen(); else await document.exitFullscreen(); applyStaticText(); } catch{} }); document.addEventListener('fullscreenchange',applyStaticText); presentationBtn.addEventListener('click',()=>{ document.body.classList.toggle('presentation-mode'); applyStaticText(); }); languageBtn.addEventListener('click',()=>{ currentLanguage = currentLanguage==='tr'?'en':'tr'; applyStaticText(); }); toneBtn.addEventListener('click',()=>{ currentTone = currentTone==='standard' ? 'dramatic' : currentTone==='dramatic' ? 'academic' : 'standard'; applyStaticText(); }); soundBtn.addEventListener('click',()=>{ soundEnabled=!soundEnabled; applyStaticText(); }); themeBtn.addEventListener('click',()=>{ currentTheme = currentTheme==='dark'?'light':'dark'; applyStaticText(); }); retryBtn.addEventListener('click',()=>{ const node=state.scenario.nodes[state.current]; const positive=node.choices.find((c)=>c.tone==='positive')||node.choices[0]; handleChoice(positive); }); document.addEventListener('keydown',(e)=>{ if(!gameScreen.classList.contains('active')) return; if(feedbackPanel.classList.contains('hidden')){ if(['1','2','3','4','5'].includes(e.key)){ const btns=[...choicesEl.querySelectorAll('button:not([disabled])')]; btns[Number(e.key)-1]?.click(); } } else if(e.key==='Enter'){ nextBtn.click(); } });
 applyStaticText(); showScreen(scenarioScreen);

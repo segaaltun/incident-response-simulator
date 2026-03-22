@@ -351,6 +351,8 @@ button:focus-visible {
   padding-left: 18px;
 }
 .choices { display:grid; gap:14px; }
+.choices.choices-count-4,
+.choices.choices-count-5 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .choice-btn, .primary {
   width:100%; border:0; border-radius:18px; padding:16px 18px; font-size:1rem; cursor:pointer;
   transition: transform 0.18s ease, opacity 0.18s ease, box-shadow 0.2s ease;
@@ -361,9 +363,19 @@ button:focus-visible {
   border:1px solid rgba(255,255,255,0.12);
   box-shadow: 0 12px 30px rgba(0,0,0,0.18);
 }
+.choice-btn.positive {
+  background: linear-gradient(135deg, rgba(71,225,193,0.18), rgba(68,199,255,0.16) 55%, rgba(143,91,255,0.18));
+}
+.choice-btn.neutral {
+  background: linear-gradient(135deg, rgba(255,207,84,0.18), rgba(68,199,255,0.14) 55%, rgba(143,91,255,0.14));
+}
+.choice-btn.negative {
+  background: linear-gradient(135deg, rgba(255,95,210,0.18), rgba(255,138,61,0.14) 55%, rgba(143,91,255,0.12));
+}
 .choice-btn:hover, .primary:hover { transform: translateY(-2px) scale(1.005); }
 .choice-btn:disabled { opacity: 0.56; cursor:not-allowed; transform:none; }
 .choice-btn.positive:hover { box-shadow: 0 16px 34px rgba(71,225,193,0.18), 0 10px 26px rgba(68,199,255,0.14); }
+.choice-btn.neutral:hover { box-shadow: 0 16px 34px rgba(255,207,84,0.16), 0 10px 26px rgba(68,199,255,0.12); }
 .choice-btn.negative:hover { box-shadow: 0 16px 34px rgba(255,95,210,0.18), 0 10px 26px rgba(255,138,61,0.14); }
 .choice-index {
   flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center; min-width:38px; height:38px;
@@ -389,6 +401,7 @@ button:focus-visible {
   padding: 12px 14px; border-radius: 16px; font-weight: 700;
 }
 .reward-strip.positive { background: linear-gradient(135deg, rgba(71,225,193,0.22), rgba(68,199,255,0.18)); border:1px solid rgba(117,240,181,0.25); }
+.reward-strip.neutral { background: linear-gradient(135deg, rgba(255,207,84,0.18), rgba(68,199,255,0.16)); border:1px solid rgba(255,207,84,0.25); }
 .reward-strip.negative { background: linear-gradient(135deg, rgba(255,95,210,0.20), rgba(255,138,61,0.20)); border:1px solid rgba(255,138,61,0.25); }
 .reward-badge {
   padding: 7px 10px; border-radius: 999px; background: rgba(255,255,255,0.10); font-size: 0.85rem;
@@ -434,7 +447,11 @@ body.presentation-mode #node-text,
 body.presentation-mode .choice-copy,
 body.presentation-mode .muted-copy,
 body.presentation-mode li { font-size: 1.14rem; line-height: 1.75; }
-body.presentation-mode .choice-btn { padding: 20px 22px; }
+body.presentation-mode .choice-btn { padding: 18px 20px; }
+body.presentation-mode .choices.choices-count-4,
+body.presentation-mode .choices.choices-count-5 { gap: 16px 18px; }
+body.presentation-mode .choices.choices-count-5 .choice-copy { font-size: 1.02rem; line-height: 1.55; }
+body.presentation-mode .choice-index { min-width: 42px; height: 42px; }
 body.presentation-mode .meter strong,
 body.presentation-mode .topbar strong { font-size: 1.7rem; }
 @keyframes pulse {
@@ -458,7 +475,7 @@ body.presentation-mode .topbar strong { font-size: 1.7rem; }
 }
 
 @media (max-width: 960px) {
-  .hero-grid, .scenario-list, .onboarding-grid, .detail-grid, .branch-progress { grid-template-columns: 1fr; }
+  .hero-grid, .scenario-list, .onboarding-grid, .detail-grid, .branch-progress, .choices.choices-count-4, .choices.choices-count-5 { grid-template-columns: 1fr; }
   .section-head { flex-direction: column; }
   .meters { grid-template-columns: repeat(2, 1fr); }
 }
