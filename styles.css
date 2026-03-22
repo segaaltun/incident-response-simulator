@@ -336,6 +336,33 @@ button:focus-visible {
   line-height: 1.78;
   color: rgba(247,243,255,0.96);
 }
+.narrative-box.has-embedded-artifact {
+  display: grid;
+  gap: 18px;
+}
+.narrative-embed {
+  margin-top: 2px;
+}
+.narrative-embed-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 14px;
+  margin-bottom: 14px;
+}
+.narrative-embed-chip {
+  margin-bottom: 0;
+  background: linear-gradient(135deg, rgba(255,138,61,0.26), rgba(68,199,255,0.20));
+  border: 1px solid rgba(255,255,255,0.14);
+  color: #fff8f1;
+}
+.narrative-embed-copy {
+  margin: 0;
+  color: rgba(238,247,255,0.82);
+  font-size: 0.94rem;
+  letter-spacing: 0.02em;
+}
 .detail-grid {
   display: grid;
   grid-template-columns: 1.3fr 1fr 1fr;
@@ -401,14 +428,6 @@ button:focus-visible {
 }
 .accordion-panel {
   padding: 0 16px 16px;
-}
-.email-sample-card {
-  margin-bottom: 22px;
-  border: 1px solid rgba(68,199,255,0.18);
-  background: linear-gradient(180deg, rgba(18,24,46,0.96), rgba(14,19,36,0.94));
-}
-.email-sample-content {
-  margin: 0;
 }
 .mail-artifact {
   overflow: hidden;
@@ -627,8 +646,8 @@ body.presentation-mode .choices.choices-count-5 .choice-copy { font-size: 1.02re
 body.presentation-mode .choice-index { min-width: 42px; height: 42px; }
 body.presentation-mode .meter strong,
 body.presentation-mode .topbar strong { font-size: 1.7rem; }
-body.presentation-mode .accordion-trigger,
-body.presentation-mode .email-sample-content { font-size: 1.05rem; }
+body.presentation-mode .accordion-trigger { font-size: 1.05rem; }
+body.presentation-mode .narrative-embed-copy { font-size: 1.02rem; }
 body.presentation-mode .mail-preview-banner strong,
 body.presentation-mode .mail-body,
 body.presentation-mode .mail-header-row { font-size: 1.02rem; }
