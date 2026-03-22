@@ -136,6 +136,12 @@ h3 { font-size: 1.05rem; }
   margin-bottom: 6px;
 }
 
+.toolbar-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .secondary-btn {
   border: 1px solid rgba(255,255,255,0.12);
   background: linear-gradient(135deg, rgba(68,199,255,0.18), rgba(143,91,255,0.18));
@@ -219,6 +225,7 @@ h3 { font-size: 1.05rem; }
   border: 1px solid rgba(255,255,255,0.10);
 }
 .live-badge.secondary { background: linear-gradient(135deg, rgba(68,199,255,0.22), rgba(143,91,255,0.20)); }
+.timer-badge.warning { background: linear-gradient(135deg, rgba(255,138,61,0.32), rgba(255,95,210,0.28)); }
 .scenario-box, .feedback {
   background: linear-gradient(180deg, rgba(27,32,64,0.88), rgba(21,25,52,0.92));
   border-radius: 22px; padding:22px; margin-bottom:22px; border:1px solid rgba(255,255,255,0.1);
@@ -280,8 +287,26 @@ h3 { font-size: 1.05rem; }
   border: 1px solid rgba(255,255,255,0.10);
 }
 .trophy-item.muted { opacity: 0.8; }
-.end-actions { margin-top: 10px; }
+.debrief-box {
+  margin-top: 20px;
+  padding: 18px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(68,199,255,0.12), rgba(143,91,255,0.12));
+  border: 1px solid rgba(255,255,255,0.10);
+}
+.end-actions { margin-top: 10px; display:flex; gap:12px; flex-wrap:wrap; }
 .label { text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.78rem; }
+
+body.presentation-mode h1 { font-size: clamp(2.6rem, 5.5vw, 4.4rem); }
+body.presentation-mode h2 { font-size: clamp(1.7rem, 3.5vw, 2.5rem); }
+body.presentation-mode .subtitle,
+body.presentation-mode #node-text,
+body.presentation-mode .choice-copy,
+body.presentation-mode .muted-copy,
+body.presentation-mode li { font-size: 1.14rem; line-height: 1.75; }
+body.presentation-mode .choice-btn { padding: 20px 22px; }
+body.presentation-mode .meter strong,
+body.presentation-mode .topbar strong { font-size: 1.7rem; }
 @keyframes pulse {
   0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255,138,61,0.55); }
   70% { transform: scale(1); box-shadow: 0 0 0 12px rgba(255,138,61,0); }

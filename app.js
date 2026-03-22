@@ -255,6 +255,8 @@ const initialState = () => ({
 
 let state = initialState();
 let pendingNext = null;
+let timer = null;
+let timeLeft = 30;
 
 const scenarioScreen = document.getElementById("scenario-screen");
 const onboardingScreen = document.getElementById("onboarding-screen");
@@ -264,6 +266,7 @@ const scenarioList = document.getElementById("scenario-list");
 const restartBtn = document.getElementById("restart-btn");
 const nextBtn = document.getElementById("next-btn");
 const fullscreenBtn = document.getElementById("fullscreen-btn");
+const presentationBtn = document.getElementById("presentation-btn");
 const onboardingStartBtn = document.getElementById("onboarding-start-btn");
 const onboardingBackBtn = document.getElementById("onboarding-back-btn");
 const onboardingScenarioTitle = document.getElementById("onboarding-scenario-title");
@@ -287,10 +290,12 @@ const progressText = document.getElementById("progress-text");
 const alertText = document.getElementById("alert-text");
 const streakBadge = document.getElementById("streak-badge");
 const scenarioName = document.getElementById("scenario-name");
+const timerBadge = document.getElementById("timer-badge");
 const finalSummary = document.getElementById("final-summary");
 const finalScores = document.getElementById("final-scores");
 const finalBadge = document.getElementById("final-badge");
 const trophyCase = document.getElementById("trophy-case");
+const debriefList = document.getElementById("debrief-list");
 
 function clamp(value) {
   return Math.max(0, Math.min(100, value));
@@ -349,6 +354,26 @@ function renderStats() {
   streakBadge.textContent = state.trophies.length ? `🏅 ${state.trophies[state.trophies.length - 1]}` : "🏅 Bonus fırsatı aktif";
 }
 
+function updateTimerBadge() {
+  timerBadge.textContent = `⏱ ${timeLeft} sn`;
+  timerBadge.classList.toggle('warning', timeLeft <= 10);
+}
+
+function startTimer() {
+  clearInterval(timer);
+  timeLeft = 30;
+  updateTimerBadge();
+  timer = setInterval(() => {
+    timeLeft -= 1;
+    updateTimerBadge();
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      const firstNegative = state.scenario.nodes[state.current].choices.find((c) => c.tone === 'negative') || state.scenario.nodes[state.current].choices[0];
+      handleChoice(firstNegative, true);
+    }
+  }, 1000);
+}
+
 function renderNode() {
   const node = state.scenario.nodes[state.current];
   nodeTitle.textContent = node.title;
@@ -372,9 +397,11 @@ function renderNode() {
   ], { duration: 280, easing: 'ease-out' });
 
   renderStats();
+  startTimer();
 }
 
-function handleChoice(choice) {
+function handleChoice(choice, autoSelected = false) {
+  clearInterval(timer);
   state.score += choice.effects.score || 0;
   state.speed = clamp(state.speed + (choice.effects.speed || 0));
   state.evidence = clamp(state.evidence + (choice.effects.evidence || 0));
@@ -388,10 +415,10 @@ function handleChoice(choice) {
     rewardStrip.className = "reward-strip positive";
     rewardStrip.innerHTML = `<span>+ Bonus</span><strong>${choice.bonus}</strong><span class="reward-badge">${choice.badge}</span>`;
   } else {
-    feedbackEmoji.textContent = "😢🙃💧";
-    feedbackHeading.textContent = "Riskli Sonuç";
+    feedbackEmoji.textContent = autoSelected ? "⏰😢💧" : "😢🙃💧";
+    feedbackHeading.textContent = autoSelected ? "Süre Doldu" : "Riskli Sonuç";
     rewardStrip.className = "reward-strip negative";
-    rewardStrip.innerHTML = `<span>− Kayıp</span><strong>${choice.bonus}</strong><span class="reward-badge">${choice.badge}</span>`;
+    rewardStrip.innerHTML = `<span>− Kayıp</span><strong>${autoSelected ? '⏱ Süre aşımı nedeniyle otomatik seçim' : choice.bonus}</strong><span class="reward-badge">${choice.badge}</span>`;
   }
 
   feedbackText.textContent = choice.feedback;
@@ -434,6 +461,12 @@ function finishGame() {
   `;
 
   trophyCase.innerHTML = "";
+  debriefList.innerHTML = `
+    <li>Containment ile delil bütünlüğü arasında denge kurmak temel başarı ölçütüdür.</li>
+    <li>Doğru eskalasyon, teknik doğruluk kadar kurumsal güven üretir.</li>
+    <li>SOP, governance ve audit trail eksikliği iyi teknik kararları bile zayıflatabilir.</li>
+    <li>Her incident response süreci, debrief ile kurumsal öğrenmeye çevrilmelidir.</li>
+  `;
   if (state.trophies.length) {
     state.trophies.forEach((trophy) => {
       const item = document.createElement("div");
@@ -484,6 +517,13 @@ fullscreenBtn.addEventListener("click", async () => {
   } catch (err) {
     console.error('Fullscreen error:', err);
   }
+});
+
+presentationBtn.addEventListener('click', () => {
+  document.body.classList.toggle('presentation-mode');
+  presentationBtn.textContent = document.body.classList.contains('presentation-mode')
+    ? '🧾 Normal Görünüm'
+    : '🎤 Projeksiyon Görünümü';
 });
 
 document.addEventListener('fullscreenchange', () => {

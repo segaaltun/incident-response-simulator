@@ -52,7 +52,10 @@
               rozet ve pozitif geri bildirimlerle ödüllendirilir.
             </p>
           </div>
-          <button id="fullscreen-btn" class="secondary-btn">⛶ Sunum Modu</button>
+          <div class="toolbar-buttons">
+            <button id="fullscreen-btn" class="secondary-btn">⛶ Sunum Modu</button>
+            <button id="presentation-btn" class="secondary-btn">🎤 Projeksiyon Görünümü</button>
+          </div>
         </div>
         <div id="scenario-list" class="scenario-list"></div>
       </section>
@@ -136,6 +139,7 @@
           <div class="live-badge" id="streak-badge">🏅 Bonus fırsatı aktif</div>
           <div class="live-badge secondary" id="scenario-name">Scenario</div>
           <div class="live-badge secondary" id="presenter-badge">Prof. Dr. Ahmet Altun</div>
+          <div class="live-badge secondary timer-badge" id="timer-badge">⏱ 30 sn</div>
         </div>
 
         <article class="scenario-box">
@@ -169,6 +173,10 @@
         <p id="final-summary"></p>
         <div id="final-scores" class="meters final"></div>
         <div id="trophy-case" class="trophy-case"></div>
+        <div class="debrief-box">
+          <h3>Kısa Debrief</h3>
+          <ul id="debrief-list"></ul>
+        </div>
         <div class="end-actions">
           <button id="restart-btn" class="primary">Senaryo Seçimine Dön</button>
         </div>
