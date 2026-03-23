@@ -137,10 +137,11 @@
           <div class="live-badge secondary timer-badge" id="timer-badge">⏱ 30 sn</div>
         </div>
 
-        <article class="scenario-box narrative-box">
+        <article id="narrative-box" class="scenario-box narrative-box">
           <div class="content-chip narrative-chip">Scenario Narrative</div>
           <h2 id="node-title"></h2>
           <p id="node-text"></p>
+          <div id="narrative-embed" class="narrative-embed hidden" aria-live="polite"></div>
         </article>
 
         <section class="detail-grid">
@@ -193,11 +194,6 @@
           </div>
         </section>
 
-        <section id="email-sample-panel" class="story-card email-sample-card hidden" aria-live="polite">
-          <div class="content-chip info-chip" id="email-sample-chip">Example Message</div>
-          <h3 id="email-sample-title">Örnek Şüpheli E-posta</h3>
-          <pre id="email-sample-content" class="email-sample-content"></pre>
-        </section>
 
         <section>
           <h3 id="choice-title"></h3>
