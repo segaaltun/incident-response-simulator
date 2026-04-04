@@ -140,8 +140,33 @@
         <article id="narrative-box" class="scenario-box narrative-box">
           <div class="content-chip narrative-chip">Scenario Narrative</div>
           <h2 id="node-title"></h2>
-          <p id="node-text"></p>
-          <div id="narrative-embed" class="narrative-embed hidden" aria-live="polite"></div>
+          <div class="narrative-content-layout">
+            <div class="narrative-text-col">
+              <p id="node-text"></p>
+              <div id="narrative-embed" class="narrative-embed hidden" aria-live="polite"></div>
+            </div>
+            <div id="node-illustration-container" class="node-illustration hidden">
+              <img id="node-image" src="" alt="Scenario Illustration" />
+            </div>
+          </div>
+        </article>
+
+        <article id="email-sample-panel" class="mail-artifact hidden" style="margin-bottom: 24px;">
+          <div class="mail-window-bar">
+            <span class="mail-window-dot" style="background:#ff5f56"></span>
+            <span class="mail-window-dot" style="background:#ffbd2e"></span>
+            <span class="mail-window-dot" style="background:#27c93f"></span>
+            <span class="mail-window-title" id="email-sample-chip">Example Message</span>
+          </div>
+          <div class="mail-preview-banner">
+            <div>
+              <span class="mail-preview-label">SECURE MAIL</span>
+            </div>
+            <strong id="email-sample-title">Sample Suspicious Email</strong>
+          </div>
+          <div class="mail-body" style="white-space: pre-wrap; font-family: monospace; font-size: 0.9em; padding: 16px;">
+            <div id="email-sample-content"></div>
+          </div>
         </article>
 
         <section class="detail-grid">
